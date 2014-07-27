@@ -1,0 +1,37 @@
+Setpoint sentence:
+	The system is disabled, so there is no set point.
+	Automatic temperature control is disabled, so there is no set point.
+	The set point is XX.X°, calculated dynamically from current conditions.
+	The set point is XX.X°, because I'm not allowed to make it colder.
+	The set point is XX.X°, because I'm not allowed to make it warmer.
+	The set point is XX.X°, because there was [a problem] calculating a better point.
+	The set point is XX.X°, specified via manual override.
+	The set point is XX.X°, specified via schedule.  [Edit schedule.]
+	
+Operating mode sentence:
+	The operating mode is HEAT because the indoor temperature is less than the set point.
+	The operating mode is HEAT because it was set manually.
+	The operating mode is AC (High) because the indoor temperature is greater than the setpoint.
+	The operating mode is AC (Med) because the indoor temperature is greater than the setpoint.
+	The operating mode is AC (Low) because the indoor temperature is greater than the setpoint.
+	The operating mode is AC (High) because it was set manually.
+	The operating mode is AC (Med) because it was set manually.
+	The operating mode is AC (Low) because it was set manually.
+	The operating mode is OFF because the indoor temp and the setpoint temp reasonably agree.
+	The operating mode is OFF because it's warmer than [SETPOINT TEMP] outside and you should just open a window.
+	The operating mode is OFF because it's cooler than [SETPOINT TEMP] outside and you should just open a window.
+	
+Override sentence:
+	<none>
+	A manual override is in effect:
+	A scheduled override is in effect:
+	
+Override action sentence:
+	-System is disabled.
+	-Heating is disabled.
+	-Cooling is disabled.
+	-Set point forced to XX.X°.
+	-Operating mode forced to HEAT.
+	-Operating mode forced to AC (High).
+	-Operating mode forced to AC (Med).
+	-Operating mode forced to AC (Low).
