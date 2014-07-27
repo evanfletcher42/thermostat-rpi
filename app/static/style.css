@@ -2,24 +2,30 @@ body {
 	margin:0;
 	padding:0;
 	font-family: Arial,Geneva,sans-serif;
-	font-size: 13px;
+	font-size: 18pt;
 }
 
 * {
-	margin: 0;
-	padding: 0;
+	margin:0;
+	padding:0;
 }
 
 p {
-	line-height: 1.5em;
+	line-height: 1.25em;
 	margin-bottom: 20px;
 }
-/*------------ Nav bar ---------- */
+
+/*---------- Nav Bar ----------*/
 #nav {
-	height: 20px;
+	height:auto;
+	margin-left: auto;
+	margin-right: auto;	
+	text-align: center;
+	padding: 30px;
 }
 
 #nav ul {
+	display: inline-block;
 	list-style: none;
 	padding: 0 10px;
 	margin: 0;
@@ -27,15 +33,59 @@ p {
 
 #nav ul li {
 	float: left;
-	padding: 0;
+	display: block;
+	padding:0;
 }
 
+#nav li + li::before {
+    content: " | ";
+}
 #nav ul li a {
+	padding: 12px 20px;
 	text-decoration: none;
-	text-transform: uppercase;
+	text-transform: lowercase;
+	color: #000000;
 }
 
-#nav li + li::before{
-	content: " | ";
+/*---------- Readouts ----------*/
+
+#readoutContainer {
+	width: 66%;
+	margin: auto;
+	height: auto;
+	max-width: 650px;
 }
 
+div.box {
+	float:left;
+	clear:none;
+	width:48%;
+	height:auto;	
+}
+
+div.readoutValue {
+	width: 90%;
+	margin:auto;
+	font-size: 72px;
+	text-align: center;
+}
+
+div.readoutCaption {
+	width: 90%;
+	margin:auto;
+	text-align: center;
+}
+
+/*----------Explain Strings----------*/
+#explainContainer {
+	width: 75%;
+	margin: auto;
+	padding: 50px;
+	display: block;
+	clear: both;
+	max-width: 900px;
+}
+
+p.explainString {
+	text-align: center;
+}

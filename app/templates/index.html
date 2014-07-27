@@ -1,7 +1,44 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Hi, {{user.nickname}}!</h1>
-{% for post in posts %}
-<div><p>{{post.author.nickname}} says: <b>{{post.body}}</b></p></div>
-{% endfor %}
-{% endblock %}
+<html>
+	<head>
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+		<title>Thermostat v0.1</title>
+	</head>
+	<body>
+		<div id="nav">
+			<ul>
+				<li><a href="index">home</a></li>
+				<li><a href="override">override</a></li>
+				<li><a href="config">config</a></li>
+				<li><a href="config">schedule</a></li>
+				<li><a href="config">graphs</a></li>
+			</ul>
+		</div>
+		
+		<!--These should be specific -->
+		<div id="readoutContainer">
+			<div class='box'> 
+				<div class='readoutValue'>{{ indoorTemp }}</div>
+				<div class='readoutCaption'>Indoor Temperature</div>
+			</div>
+			<div class='box'> 
+				<div class='readoutValue'>{{ outdoorTemp }}</div>
+				<div class='readoutCaption'>Outdoor Temperature</div>
+			</div>
+			<div class='box'> 
+				<div class='readoutValue'>{{ setpointTemp }}</div>
+				<div class='readoutCaption'>Set Point Temperature</div>
+			</div>
+			<div class='box'> 
+				<div class='readoutValue'>{{ opMode }}</div>
+				<div class='readoutCaption'>Operating Mode</div>
+			</div>
+		</div>
+		
+		<!--This should  be a for loop iterating through an arbitrary number of messages.-->
+		<div id="explainContainer">
+			{% for expstr in explainStrings %}
+			<p class='explainString'>expstr</p>
+			{% endfor %}
+		</div>
+	</body>
+</html>
