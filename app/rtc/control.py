@@ -20,6 +20,8 @@ def read_temp_raw(): #a function that grabs the raw temperature data from the se
 def read_temp(): #a function that checks that the connection was good and strips out the temperature
     lines = read_temp_raw()
     while lines[0].strip()[-3:] != 'YES' or lines[2].strip()[-3:] != 'YES':
+        print "error reading from sensor:"
+        print lines
         time.sleep(0.2)
         lines = read_temp_raw()
     equals_pos = lines[1].find('t='), lines[3].find('t=')
