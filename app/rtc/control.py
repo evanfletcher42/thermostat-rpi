@@ -4,9 +4,158 @@ import rfc822
 from datetime import datetime
 import os, glob, time, sys
 
-MAX_SETPOINT_C = (77-32)*5/9
-MIN_SETPOINT_C = (70-32)*5/9
+def cToF(tempC): #function that converts Celsius to Fahrenheit 
+    return tempC*9/5 + 32
+    
+def fToC(tempF): #function that converts Fahrenheit to Celsius
+    return (tempF - 32)*5/9
 
+#The calculated setpoint will be between these two numbers
+T_MAX_SETPOINT_C    = fToC(77)
+T_MIN_SETPOINT_C    = fToC(70)
+
+#If AC mode and temp > setpoint, AC will turn on.
+#AC will turn off when temp drops below setpoint - T_COOL_THRESH_C
+T_COOL_HYST_C     = 1
+
+#If HEAT mode and temp < setpoint, HEAT will turn on.
+#AC will turn off when temp climbs above setpoint + T_HEAT_THRESH_C
+T_HEAT_HYST_C     = 1
+
+#Mode will switch from heat to cool if temperature goes above this
+T_COOL_MODE_C       = fToC(79)
+
+#Mode will switch from cool to heat if temperature goes below this
+T_HEAT_MODE_C       = fToC(65)
+
+# enum describing thermostat state
+class thermoState:
+    INIT,       \
+    COOL_OFF,   \
+    COOL_EXT,   \
+    COOL_LOW,   \
+    COOL_MED,   \
+    COOL_HIGH,  \
+    HEAT_OFF,   \
+    HEAT_EXT,   \
+    HEAT_ON     = range(9)
+    
+thermoStateStr = {
+    thermoState.INIT        : "INIT",
+    thermoState.COOL_OFF    : "OFF (C)",
+    thermoState.COOL_EXT    : "OFF (Ext)",
+    thermoState.COOL_LOW    : "AC (Low)",
+    thermoState.COOL_MED    : "AC (Med)",
+    thermoState.COOL_HIGH   : "AC (High)",
+    thermoState.HEAT_OFF    : "OFF (H)",
+    thermoState.HEAT_EXT    : "OFF (Ext)",
+    thermoState.HEAT_ON     : "HEAT"
+}
+
+#--- State Transition Functions ---
+# These all take (tInt, tExt, tSet) as arguments and return the next state.
+# If real-time functions need to happen on a state edge (i.e. turn on/off AC),
+# they should go in these functions.
+# (this is essentially a Pythonic switch-case)
+
+def tSInit(tInt, tExt, tSet):
+    if tExt < tSet:
+        return thermoState.HEAT_OFF
+        
+    return thermoState.COOL_OFF
+        
+def tSCoolOff(tInt, tExt, tSet):
+    #First check if we should even be in heating mode
+    if tInt < T_HEAT_MODE_C:
+        return thermoState.HEAT_OFF
+    
+    #Do we need to modify the temperature?
+    if tInt > tSet:
+        if tExt <= tSet:
+            return thermoState.COOL_EXT
+        return thermoState.COOL_MED
+        
+    return thermoState.COOL_OFF
+    
+def tSCoolExt(tInt, tExt, tSet):
+    if tExt <= tSet and tInt > tSet:
+        return thermoState.COOL_EXT
+    
+    return thermoState.COOL_OFF
+    
+def tSCoolLow(tInt, tExt, tSet):
+    #TODO figure out if fan speed control helps AC.  Until then use medium only
+    return thermoState.COOL_MED
+    
+def tSCoolMed(tInt, tExt, tSet):
+    #check if done cooling the place off (has hysteresis to allow for air mixing)
+    if tInt <= tSet - T_COOL_HYST_C:
+        return thermoState.COOL_OFF
+        
+    #check if we should open a window rather than waste power with AC
+    if tExt <= tSet:
+        return thermoState.COOL_EXT
+     
+    return thermoState.COOL_MED
+    
+def tSCoolHigh(tInt, tExt, tSet):
+    #TODO figure out if fan speed control helps AC.  Until then use medium only
+    return thermoState.COOL_MED
+    
+def tSHeatOff(tInt, tExt, tSet):
+    #First check if we should even be in heating mode
+    if tInt > T_COOL_MODE_C:
+        return thermoState.COOL_OFF
+    
+    #Do we need to modify the temperature?
+    if tInt < tSet:
+        if tExt >= tSet:
+            return thermoState.HEAT_EXT
+        return thermoState.HEAT_ON
+        
+    return thermoState.HEAT_OFF
+    
+def tSHeatExt(tInt, tExt, tSet):
+    if tExt >= tSet and tInt < tSet:
+        return thermoState.HEAT_EXT
+    
+    return thermoState.HEAT_OFF
+    
+def tSHeatOn(tInt, tExt, tSet):
+    #check if done heating the place (has hysteresis to allow for air mixing)
+    if tInt >= tSet + T_HEAT_HYST_C:
+        return thermoState.COOL_OFF
+        
+    #check if we should open a window rather than waste power with heating
+    if tExt >= tSet:
+        return thermoState.HEAT_EXT
+     
+    return thermoState.HEAT_ON
+  
+state = thermoState.INIT  # The state variable.  This is global.
+
+thermoStateTrFcn = {
+    thermoState.INIT        : tSInit,
+    thermoState.COOL_OFF    : tSCoolOff,
+    thermoState.COOL_EXT    : tSCoolExt,
+    thermoState.COOL_LOW    : tSCoolLow,
+    thermoState.COOL_MED    : tSCoolMed,
+    thermoState.COOL_HIGH   : tSCoolHigh,
+    thermoState.HEAT_OFF    : tSHeatOff,
+    thermoState.HEAT_EXT    : tSHeatExt,
+    thermoState.HEAT_ON     : tSHeatOn
+}
+
+def nextState(tInt, tExt, tSet): #function that computes next state given current state and temps
+    global state
+    nextState = thermoStateTrFcn[state](tInt, tExt, tSet)
+    #if nextState != state:
+        #print thermoStateStr[state], " -> ", thermoStateStr[nextState] #TMPD debug
+        #TODO update the database r/e this
+    
+    state = nextState;
+    
+    
 def read_temp_raw(): #a function that grabs the raw temperature data from the sensor
     f_1 = open(device_file[0], 'r')
     lines_1 = f_1.readlines()
@@ -33,24 +182,39 @@ def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external tem
 	setpoint = min(setpoint, maxSet)
 	return setpoint
 	
-result = pywapi.get_weather_from_noaa('KBDU')
+iterCount = 0;
+ITER_REPRINT_HEAD = 30;
+while True:
+    startTime = time.time();
+    result = pywapi.get_weather_from_noaa('KBDU')
 
-location   = result['location']
-dt_weather =  datetime.fromtimestamp(rfc822.mktime_tz(rfc822.parsedate_tz(result['observation_time_rfc822'])))
-ext_temp_c = float(result['temp_c'])
+    location   = result['location']
+    dt_weather =  datetime.fromtimestamp(rfc822.mktime_tz(rfc822.parsedate_tz(result['observation_time_rfc822'])))
+    ext_temp_c = float(result['temp_c'])
 
-print 'location: \t', location
-print 'obs time: \t', str(dt_weather)
-print 'ext temp: \t', ext_temp_c
+    #print 'location: \t', location
+    #print 'obs time: \t', str(dt_weather)
+    #print 'ext temp: \t', ext_temp_c
 
-device_folder = glob.glob('/sys/bus/w1/devices/28*')
-device_file = [device_folder[0] + '/w1_slave', device_folder[1] + '/w1_slave']
+    device_folder = glob.glob('/sys/bus/w1/devices/28*')
+    device_file = [device_folder[0] + '/w1_slave', device_folder[1] + '/w1_slave']
 
-temp = read_temp() #get the temp
-dt_meas = datetime.now()
-print 'meas time: \t', str(dt_meas)
-print 'int temp:  \t', temp[1]
-print 'sys temp:  \t', temp[0]
+    temp = read_temp() #get the temp
+    dt_meas = datetime.now()
+    #print 'meas time: \t', str(dt_meas)
+    #print 'int temp:  \t', temp[1]
+    #print 'sys temp:  \t', temp[0]
 
-setpt = calc_setpoint(ext_temp_c, MIN_SETPOINT_C, MAX_SETPOINT_C)
-print '\nsetpoint: \t', setpt
+    setpt = calc_setpoint(ext_temp_c, T_MIN_SETPOINT_C, T_MAX_SETPOINT_C)
+    #print '\nsetpoint: \t', setpt
+    
+    nextState(temp[1], ext_temp_c, setpt)
+    
+    if iterCount == 0:
+        print "Time \t\t\t\tT_int \tT_ext \tT_set \tState"
+    
+    print str(dt_meas), "\t", temp[1], "\t", ext_temp_c, "\t", setpt, "\t", thermoStateStr[state]
+    iterCount = (iterCount + 1) % ITER_REPRINT_HEAD
+    
+    time.sleep(10-(time.time() - startTime))
+#TODO update the database about all of the above
