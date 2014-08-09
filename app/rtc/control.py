@@ -5,7 +5,7 @@ import rfc822
 result = pywapi.get_weather_from_noaa('KBDU')
 
 location = result['location']
-dt 		 = rfc822.parsedate_tz(result['observation_time_rfc822'])
+dt 		 = datetime(rfc822.parsedate_tz(result['observation_time_rfc822']))
 temp_c	 = float(result['temp_c'])
 
 print 'location: \t', location
