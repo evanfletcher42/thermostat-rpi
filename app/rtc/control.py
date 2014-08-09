@@ -4,6 +4,9 @@ import rfc822
 from datetime import datetime
 import os, glob, time, sys
 
+MAX_SETPOINT_C = (77-32)*5/9
+MIN_SETPOINT_C = (70-32)*5/9
+
 def read_temp_raw(): #a function that grabs the raw temperature data from the sensor
     f_1 = open(device_file[0], 'r')
     lines_1 = f_1.readlines()
@@ -23,15 +26,20 @@ def read_temp(): #a function that checks that the connection was good and strips
     temp = float(lines[1][equals_pos[0]+2:])/1000, float(lines[3][equals_pos[1]+2:])/1000
     return temp
 
+def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external temperature
+	setpoint = max(minSet, extTemp)
+	setpoint = min(setpoint, maxSet)
+	return setpoint
+	
 result = pywapi.get_weather_from_noaa('KBDU')
 
 location   = result['location']
 dt_weather =  datetime.fromtimestamp(rfc822.mktime_tz(rfc822.parsedate_tz(result['observation_time_rfc822'])))
-temp_c	   = float(result['temp_c'])
+ext_temp_c = float(result['temp_c'])
 
 print 'location: \t', location
 print 'obs time: \t', str(dt_weather)
-print 'ext temp: \t', temp_c
+print 'ext temp: \t', ext_temp_c
 
 device_folder = glob.glob('/sys/bus/w1/devices/28*')
 device_file = [device_folder[0] + '/w1_slave', device_folder[1] + '/w1_slave']
@@ -41,3 +49,6 @@ dt_meas = datetime.now()
 print 'meas time: \t', str(dt_meas)
 print 'int temp:  \t', temp[1]
 print 'sys temp:  \t', temp[0]
+
+setpt = calc_setpoint(ext_temp_c, MIN_SETPOINT_C, MAX_SETPOINT_C)
+print '\nsetpoint: \t', setpt
