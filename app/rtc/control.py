@@ -62,9 +62,7 @@ thermoStateStr = {
 # (this is essentially a Pythonic switch-case)
 
 def tSInit(tInt, tExt, tSet):
-    if tExt < tSet:
-        return thermoState.HEAT_OFF
-        
+    #TODO consider weather forecast in initialization
     return thermoState.COOL_OFF
         
 def tSCoolOff(tInt, tExt, tSet):
