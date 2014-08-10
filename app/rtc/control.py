@@ -206,6 +206,9 @@ while True:
     
     obs = Metar.Metar(metar_str)
     
+    if not obs.temp:
+        continue
+    
     location   = obs.station_id
     dt_weather = obs.time
     ext_temp_c = obs.temp.value(units="C")
