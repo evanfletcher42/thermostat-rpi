@@ -181,7 +181,7 @@ def read_temp(): #a function that checks that the connection was good and strips
 def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external temperature
 	setpoint = max(minSet, extTemp)
 	setpoint = min(setpoint, maxSet)
-	return setpoint
+	return round(setpoint, 2)
 	
 iterCount = 0;
 ITER_REPRINT_HEAD = 30;
