@@ -190,12 +190,19 @@ while True:
     
     # pull the latest raw METAR data and parse it
     metar_str = ""
-    data = urllib2.urlopen("http://w1.weather.gov/data/METAR/KBDU.1.txt") 
-    for line in data:
-        if line.startswith('METAR') or line.startswith('SPECI'):
-            metar_str = line
-            break
-    data.close()
+    try:
+        data = urllib2.urlopen("http://w1.weather.gov/data/METAR/KBDU.1.txt", timeout=1) 
+        for line in data:
+            if line.startswith('METAR') or line.startswith('SPECI'):
+                metar_str = line
+                break
+        data.close()
+    except urllib2.URLError as e:
+        print type(e)
+        continue
+    except socket.timeout as e:
+        print type(e)
+        continue
     
     obs = Metar.Metar(metar_str)
     
@@ -227,5 +234,5 @@ while True:
     print str(dt_meas), "\t", temp[1], "\t", ext_temp_c, "\t", setpt, "\t", thermoStateStr[state]
     iterCount = (iterCount + 1) % ITER_REPRINT_HEAD
     f.flush()
-    time.sleep(10-(time.time() - startTime))
+    time.sleep(max(0,10-(time.time() - startTime)))
 #TODO update the database about all of the above
