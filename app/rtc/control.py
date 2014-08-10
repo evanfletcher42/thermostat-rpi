@@ -3,6 +3,10 @@ import os, glob, time, sys
 from metar import Metar
 import urllib2
 
+#HACK: Redirect stdout to file because regular piping isn't working for some reason.
+f = file('runLog.txt', 'a')
+sys.stdout = f
+
 def cToF(tempC): #function that converts Celsius to Fahrenheit 
     return tempC*9/5 + 32
     
@@ -223,6 +227,6 @@ while True:
     
     print str(dt_meas), "\t", temp[1], "\t", ext_temp_c, "\t", setpt, "\t", thermoStateStr[state]
     iterCount = (iterCount + 1) % ITER_REPRINT_HEAD
-    
+    f.flush()
     time.sleep(10-(time.time() - startTime))
 #TODO update the database about all of the above
