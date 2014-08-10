@@ -2,6 +2,7 @@ from datetime import datetime
 import os, glob, time, sys
 from metar import Metar
 import urllib2
+import socket
 import LIRCCmd
 
 #HACK: Redirect stdout to file because regular piping isn't working for some reason.
