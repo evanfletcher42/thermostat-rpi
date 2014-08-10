@@ -2,6 +2,7 @@ from datetime import datetime
 import os, glob, time, sys
 from metar import Metar
 import urllib2
+import LIRCCmd
 
 #HACK: Redirect stdout to file because regular piping isn't working for some reason.
 f = file('runLog.txt', 'a')
@@ -63,7 +64,8 @@ thermoStateStr = {
 
 def tSInit(tInt, tExt, tSet):
     #TODO consider weather forecast in initialization
-    os.system("irsend SEND_ONCE GE_AirConditioner fan")
+    LIRCCmd.setFanMode()
+    LIRCCmd.setFanHi()
     return thermoState.COOL_OFF
         
 def tSCoolOff(tInt, tExt, tSet):
@@ -74,11 +76,11 @@ def tSCoolOff(tInt, tExt, tSet):
     #Do we need to modify the temperature?
     if tInt > tSet:
         if tExt <= tSet:
-            os.system("irsend SEND_ONCE GE_AirConditioner fan")
-            os.system("irsend SEND_ONCE GE_AirConditioner hi")
+            LIRCCmd.setFanMode()
+            LIRCCmd.setFanHi()
             return thermoState.COOL_EXT
-        os.system("irsend SEND_ONCE GE_AirConditioner cool")
-        os.system("irsend SEND_ONCE GE_AirConditioner mid")
+        LIRCCmd.setCoolMode()
+        LIRCCMd.setFanMid()
         return thermoState.COOL_MED
         
     return thermoState.COOL_OFF
@@ -87,33 +89,36 @@ def tSCoolExt(tInt, tExt, tSet):
     if tExt <= tSet and tInt > tSet:
         return thermoState.COOL_EXT
     
-    os.system("irsend SEND_ONCE GE_AirConditioner fan")
+    LIRCCmd.setFanMode()
+    LIRCCmd.setFanMed()
     return thermoState.COOL_OFF
     
 def tSCoolLow(tInt, tExt, tSet):
     #TODO figure out if fan speed control helps AC.  Until then use medium only
-    os.system("irsend SEND_ONCE GE_AirConditioner cool")
-    os.system("irsend SEND_ONCE GE_AirConditioner mid")
+    LIRCCmd.setCoolMode()
+    LIRCCmd.setFanMed()
+    
     return thermoState.COOL_MED
     
 def tSCoolMed(tInt, tExt, tSet):
     #check if done cooling the place off (has hysteresis to allow for air mixing)
     if tInt <= tSet - T_COOL_HYST_C:
-        os.system("irsend SEND_ONCE GE_AirConditioner fan")
+        LIRCCmd.setFanMode()
+        LIRCCmd.setFanHi()
         return thermoState.COOL_OFF
         
     #check if we should open a window rather than waste power with AC
     if tExt <= tSet:
-        os.system("irsend SEND_ONCE GE_AirConditioner fan")
-        os.system("irsend SEND_ONCE GE_AirConditioner hi")
+        LIRCCmd.setFanMode()
+        LIRCCmd.setFanHi()
         return thermoState.COOL_EXT
      
     return thermoState.COOL_MED
     
 def tSCoolHigh(tInt, tExt, tSet):
     #TODO figure out if fan speed control helps AC.  Until then use medium only
-    os.system("irsend SEND_ONCE GE_AirConditioner cool")
-    os.system("irsend SEND_ONCE GE_AirConditioner mid")
+    LIRCCmd.setCoolMode()
+    LIRCCmd.setFanMed()
     return thermoState.COOL_MED
     
 def tSHeatOff(tInt, tExt, tSet):
