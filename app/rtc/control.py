@@ -8,10 +8,10 @@ f = file('runLog.txt', 'a')
 sys.stdout = f
 
 def cToF(tempC): #function that converts Celsius to Fahrenheit 
-    return tempC*9/5 + 32
+    return float(tempC)*9/5 + 32
     
 def fToC(tempF): #function that converts Fahrenheit to Celsius
-    return (tempF - 32)*5/9
+    return (float(tempF) - 32)*5/9
 
 #The calculated setpoint will be between these two numbers
 T_MAX_SETPOINT_C    = fToC(77)
