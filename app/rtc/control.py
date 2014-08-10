@@ -197,6 +197,7 @@ while True:
         if line.startswith('METAR') or line.startswith('SPECI'):
             metar_str = line
             break
+    data.close()
     
     obs = Metar.Metar(metar_str)
     
