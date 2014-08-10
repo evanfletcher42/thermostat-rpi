@@ -1,8 +1,7 @@
-import pywapi
-import pprint
-import rfc822
 from datetime import datetime
 import os, glob, time, sys
+from metar import Metar
+import urllib2
 
 def cToF(tempC): #function that converts Celsius to Fahrenheit 
     return tempC*9/5 + 32
@@ -186,11 +185,20 @@ iterCount = 0;
 ITER_REPRINT_HEAD = 30;
 while True:
     startTime = time.time();
-    result = pywapi.get_weather_from_noaa('KBDU')
-
-    location   = result['location']
-    dt_weather =  datetime.fromtimestamp(rfc822.mktime_tz(rfc822.parsedate_tz(result['observation_time_rfc822'])))
-    ext_temp_c = float(result['temp_c'])
+    
+    # pull the latest raw METAR data and parse it
+    metar_str = ""
+    data = urllib2.urlopen("http://w1.weather.gov/data/METAR/KBDU.1.txt") 
+    for line in data:
+        if line.startswith('METAR') or line.startswith('SPECI'):
+            metar_str = line
+            break
+    
+    obs = Metar.Metar(metar_str)
+    
+    location   = obs.station_id
+    dt_weather = obs.time
+    ext_temp_c = obs.temp.value(units="C")
 
     #print 'location: \t', location
     #print 'obs time: \t', str(dt_weather)
