@@ -81,7 +81,7 @@ def tSCoolOff(tInt, tExt, tSet):
             LIRCCmd.setFanHi()
             return thermoState.COOL_EXT
         LIRCCmd.setCoolMode()
-        LIRCCMd.setFanMid()
+        LIRCCmd.setFanMed()
         return thermoState.COOL_MED
         
     return thermoState.COOL_OFF
