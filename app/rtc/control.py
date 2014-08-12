@@ -66,7 +66,7 @@ thermoStateStr = {
 def tSInit(tInt, tExt, tSet):
     #TODO consider weather forecast in initialization
     LIRCCmd.setFanMode()
-    LIRCCmd.setFanHi()
+    LIRCCmd.setFanMed()
     return thermoState.COOL_OFF
         
 def tSCoolOff(tInt, tExt, tSet):
@@ -78,7 +78,7 @@ def tSCoolOff(tInt, tExt, tSet):
     if tInt > tSet:
         if tExt <= tSet:
             LIRCCmd.setFanMode()
-            LIRCCmd.setFanHi()
+            LIRCCmd.setFanLow()
             return thermoState.COOL_EXT
         LIRCCmd.setCoolMode()
         LIRCCmd.setFanMed()
@@ -105,13 +105,13 @@ def tSCoolMed(tInt, tExt, tSet):
     #check if done cooling the place off (has hysteresis to allow for air mixing)
     if tInt <= tSet - T_COOL_HYST_C:
         LIRCCmd.setFanMode()
-        LIRCCmd.setFanHi()
+        LIRCCmd.setFanMed()
         return thermoState.COOL_OFF
         
     #check if we should open a window rather than waste power with AC
     if tExt <= tSet:
         LIRCCmd.setFanMode()
-        LIRCCmd.setFanHi()
+        LIRCCmd.setFanMed()
         return thermoState.COOL_EXT
      
     return thermoState.COOL_MED
