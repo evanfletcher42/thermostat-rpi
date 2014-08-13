@@ -1,6 +1,6 @@
 from datetime import datetime
 import os, glob, time, sys
-from metar import Metar
+import wunderground
 import urllib2
 import socket
 import LIRCCmd
@@ -207,34 +207,10 @@ ITER_REPRINT_HEAD = 30;
 while True:
     startTime = time.time();
     
-    # pull the latest raw METAR data and parse it
-    metar_str = ""
-    try:
-        data = urllib2.urlopen("http://w1.weather.gov/data/METAR/KBDU.1.txt", timeout=1) 
-        for line in data:
-            if line.startswith('METAR') or line.startswith('SPECI'):
-                metar_str = line
-                break
-        data.close()
-    except urllib2.URLError as e:
-        print type(e)
+    #pull current weather from wunderground
+    ext_temp_c = wunderground.getTempC()
+    if not ext_temp_c:
         continue
-    except socket.timeout as e:
-        print type(e)
-        continue
-    
-    obs = Metar.Metar(metar_str)
-    
-    if not obs.temp:
-        continue
-    
-    location   = obs.station_id
-    dt_weather = obs.time
-    ext_temp_c = obs.temp.value(units="C")
-
-    #print 'location: \t', location
-    #print 'obs time: \t', str(dt_weather)
-    #print 'ext temp: \t', ext_temp_c
 
     device_folder = glob.glob('/sys/bus/w1/devices/28*')
     device_file = [device_folder[0] + '/w1_slave', device_folder[1] + '/w1_slave']
