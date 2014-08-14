@@ -81,8 +81,8 @@ def tSCoolOff(tInt, tExt, tSet):
             LIRCCmd.setFanLow()
             return thermoState.COOL_EXT
         LIRCCmd.setCoolMode()
-        LIRCCmd.setFanMed()
-        return thermoState.COOL_MED
+        LIRCCmd.setFanHi()
+        return thermoState.COOL_HIGH
         
     return thermoState.COOL_OFF
     
@@ -95,13 +95,19 @@ def tSCoolExt(tInt, tExt, tSet):
     return thermoState.COOL_OFF
     
 def tSCoolLow(tInt, tExt, tSet):
-    #TODO figure out if fan speed control helps AC.  Until then use medium only
+    #TODO figure out if fan speed control helps AC.  Until then use high only
     LIRCCmd.setCoolMode()
-    LIRCCmd.setFanMed()
+    LIRCCmd.setFanHi()
     
-    return thermoState.COOL_MED
+    return thermoState.COOL_HIGH
     
 def tSCoolMed(tInt, tExt, tSet):
+    #TODO figure out if fan speed control helps AC.  Until then use high only
+    LIRCCmd.setCoolMode()
+    LIRCCmd.setFanHi()
+    return thermoState.COOL_HIGH
+    
+def tSCoolHigh(tInt, tExt, tSet):
     #check if done cooling the place off (has hysteresis to allow for air mixing)
     if tInt <= tSet - T_COOL_HYST_C:
         LIRCCmd.setFanMode()
@@ -114,13 +120,7 @@ def tSCoolMed(tInt, tExt, tSet):
         LIRCCmd.setFanMed()
         return thermoState.COOL_EXT
      
-    return thermoState.COOL_MED
-    
-def tSCoolHigh(tInt, tExt, tSet):
-    #TODO figure out if fan speed control helps AC.  Until then use medium only
-    LIRCCmd.setCoolMode()
-    LIRCCmd.setFanMed()
-    return thermoState.COOL_MED
+    return thermoState.COOL_HIGH
     
 def tSHeatOff(tInt, tExt, tSet):
     #First check if we should even be in heating mode
