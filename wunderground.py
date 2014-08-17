@@ -30,7 +30,7 @@ def getTempC():
     global __last_parsed_json
     update_weather()
     if __last_parsed_json:
-        return (rfc822.parsedate_tz(__last_parsed_json['current_observation']['observation_time']), \
+        return (rfc822.parsedate_tz(__last_parsed_json['current_observation']['observation_time_rfc822']), \
         float(__last_parsed_json['current_observation']['temp_c']) )
     else:
         return None
