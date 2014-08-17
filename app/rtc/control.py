@@ -5,6 +5,8 @@ import urllib2
 import socket
 import LIRCCmd
 
+from app import db, models
+
 #HACK: Redirect stdout to file because regular piping isn't working for some reason.
 f = file('runLog.txt', 'a')
 sys.stdout = f
@@ -204,14 +206,20 @@ def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external tem
 	
 iterCount = 0;
 ITER_REPRINT_HEAD = 30;
+lastObsTime = None
 while True:
     startTime = time.time();
     
     #pull current weather from wunderground
-    ext_temp_c = wunderground.getTempC()
+    (obsTime, ext_temp_c) = wunderground.getTempC()
     if not ext_temp_c:
         continue
 
+    if not lastObsTime or lastObsTime < obsTime:
+        wLog = models.WeatherData(time=obsTime, extTemp = ext_temp_c)
+        db.session.add(p)
+        db.session.commit()
+        
     device_folder = glob.glob('/sys/bus/w1/devices/28*')
     device_file = [device_folder[0] + '/w1_slave', device_folder[1] + '/w1_slave']
 
@@ -228,6 +236,10 @@ while True:
     
     if iterCount == 0:
         print "Time \t\t\t\tT_int \tT_ext \tT_set \tState"
+    
+    opLog = models.OperationLog(time = dt_meas, indoorTemp = temp[1], setpointTemp = setpt, state = state)
+    db.session.add(opLog)
+    db.session.commit()
     
     print str(dt_meas), "\t", temp[1], "\t", ext_temp_c, "\t", setpt, "\t", thermoStateStr[state]
     iterCount = (iterCount + 1) % ITER_REPRINT_HEAD
