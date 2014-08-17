@@ -23,17 +23,17 @@ class WeatherForecast(db.Model):
     
 # Valid commands for schedule.
 class Commands:
-    DISABLE_ALL,    \       # 0  = Disable system entirely (everything off)
-    DISABLE_HEAT,   \       # 1  = Prevent heating
-    DISABLE_COOL,   \       # 2  = Prevent cooling
-    FORCE_SETPT,    \       # 3  = Force setpoint to value in argument
-    FORCE_FAN_LOW,  \       # 4  = Force operating mode to FAN (Low)
-    FORCE_FAN_MED,  \       # 5  = Force operating mode to FAN (Med)
-    FORCE_FAN_HI,   \       # 6  = Force operating mode to FAN (High)
-    FORCE_AC_LOW,   \       # 7  = Force operating mode to AC (Low)
-    FORCE_AC_MED,   \       # 8  = Force operating mode to AC (Med)
-    FORCE_AC_HI,    \       # 9  = Force operating mode to AC (High)
-    FORCE_HEAT = range(11)  # 10 = Force operating mode to HEAT
+    DISABLE_ALL,    \
+    DISABLE_HEAT,   \
+    DISABLE_COOL,   \
+    FORCE_SETPT,    \
+    FORCE_FAN_LOW,  \
+    FORCE_FAN_MED,  \
+    FORCE_FAN_HI,   \
+    FORCE_AC_LOW,   \
+    FORCE_AC_MED,   \
+    FORCE_AC_HI,    \
+    FORCE_HEAT = range(11)
     # ... (add more here)
     
 # Contains information about scheduled events (i.e. disabling stuff while away)
