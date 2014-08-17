@@ -217,7 +217,7 @@ while True:
 
     if not lastObsTime or lastObsTime < obsTime:
         wLog = models.WeatherData(time=obsTime, extTemp = ext_temp_c)
-        db.session.add(p)
+        db.session.add(wLog)
         db.session.commit()
         
     device_folder = glob.glob('/sys/bus/w1/devices/28*')
