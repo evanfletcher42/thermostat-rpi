@@ -219,6 +219,7 @@ while True:
         wLog = models.WeatherData(time=obsTime, extTemp = ext_temp_c)
         db.session.add(wLog)
         db.session.commit()
+        lastObsTime = obsTime;
         
     device_folder = glob.glob('/sys/bus/w1/devices/28*')
     device_file = [device_folder[0] + '/w1_slave', device_folder[1] + '/w1_slave']
