@@ -2,7 +2,6 @@ import urllib2, json, socket
 from datetime import datetime
 import time, rfc822
 
-from app import db, models
 __MIN_UPDATE_PERIOD_SECONDS = 5*60
 __lastUpdateTime = 0
 __last_parsed_json = None
