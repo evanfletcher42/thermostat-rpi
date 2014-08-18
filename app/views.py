@@ -15,13 +15,13 @@ thermoStateStr = {
     8    : u"HEAT"
 }
 
-@app.route('/_get_current_data')
+@app.route(u'/_get_current_data')
 def get_current_data():
     opLog = models.OperationLog.query.order_by(u"-id").first()
     mTime  = unicode(opLog.time)
     inTemp = unicode(opLog.indoorTemp) + u'°'
     setPtTemp = unicode(opLog.setpointTemp) + u'°'
-    state = thermoStateStr[opLog.state]
+    state = unicode(thermoStateStr[opLog.state])
     
     wData = models.WeatherData.query.order_by(u"-id").first()
     extTemp = unicode(wData.extTemp) + u'°'
@@ -38,4 +38,4 @@ def get_current_data():
 
 def index():
     title = u'Thermostat v0.1'
-    return render_template(u"index.html", title=title, explainStrings=[])
+    return render_template(u"index.html", title=title, explainStrings=[u'Test string'])
