@@ -6,10 +6,10 @@ from app import db, models
 thermoStateStr = {
     0    : u"INIT",
     1    : u"OFF (C)",
-    2    : u"OFF (Ext)",
-    3    : u"AC (Low)",
-    4    : u"AC (Med)",
-    5    : u"AC (High)",
+    2    : u"EXT",
+    3    : u"AC (L)",
+    4    : u"AC (M)",
+    5    : u"AC (H)",
     6    : u"OFF (H)",
     7    : u"OFF (Ext)",
     8    : u"HEAT"
@@ -19,12 +19,12 @@ thermoStateStr = {
 def get_current_data():
     opLog = models.OperationLog.query.order_by(u"-id").first()
     mTime  = unicode(opLog.time)
-    inTemp = unicode(opLog.indoorTemp) + u'°'
-    setPtTemp = unicode(opLog.setpointTemp) + u'°'
+    inTemp = unicode("%.1f" % opLog.indoorTemp) + u'°'
+    setPtTemp = unicode("%.1f" % opLog.setpointTemp) + u'°'
     state = unicode(thermoStateStr[opLog.state])
     
     wData = models.WeatherData.query.order_by(u"-id").first()
-    extTemp = unicode(wData.extTemp) + u'°'
+    extTemp = unicode("%.1f" % wData.extTemp) + u'°'
     
     return jsonify({
         u'inTemp'    : inTemp,
