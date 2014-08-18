@@ -1,6 +1,25 @@
 <html>
 	<head>
 		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+		
+		<script type=text/javascript>
+			setInterval(									//Periodically 
+				function()
+				{
+					$.getJSON(                            	// Get some values from the server
+						'/_get_current_data',				// At this URL
+						{},									// With no extra parameters
+						function(data)						// And when you get a response
+						{
+							$("#inTemp").text(data.inTemp); 	// Write the results into the 
+							$("#outTemp").text(data.outTemp); 	// various elements
+							$("#setPtTemp").text(data.setPtTemp);
+							$("#opMode").text(data.inTemp);
+						});
+				},
+			10000);											// And do it every 10 seconds
 		<title>{{ title }}</title>
 	</head>
 	<body>
@@ -17,19 +36,19 @@
 		<!--These should be specific -->
 		<div id="readoutContainer">
 			<div class='box'> 
-				<div class='readoutValue'>{{ indoorTemp }}</div>
+				<div class='readoutValue' id='inTemp'>--°</div>
 				<div class='readoutCaption'>Indoor Temperature</div>
 			</div>
 			<div class='box'> 
-				<div class='readoutValue'>{{ outdoorTemp }}</div>
+				<div class='readoutValue' id='outTemp'>--°</div>
 				<div class='readoutCaption'>Outdoor Temperature</div>
 			</div>
 			<div class='box'> 
-				<div class='readoutValue'>{{ setpointTemp }}</div>
+				<div class='readoutValue' id='setPtTemp'>--°</div>
 				<div class='readoutCaption'>Set Point Temperature</div>
 			</div>
 			<div class='box'> 
-				<div class='readoutValue'>{{ opMode }}</div>
+				<div class='readoutValue' id='opMode'>--</div>
 				<div class='readoutCaption'>Operating Mode</div>
 			</div>
 		</div>

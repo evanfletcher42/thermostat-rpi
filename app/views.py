@@ -1,17 +1,41 @@
 # -*- coding: utf-8 -*-
-from flask import render_template
+from flask import render_template, jsonify
 from app import app
+from app import db, models
+
+thermoStateStr = {
+    0        : u"INIT",
+    1    : u"OFF (C)",
+    2    : u"OFF (Ext)",
+    3    : u"AC (Low)",
+    4    : u"AC (Med)",
+    5   : u"AC (High)",
+    6    : u"OFF (H)",
+    7    : u"OFF (Ext)",
+    8     : u"HEAT"
+}
+
+@app.route('/_get_current_data')
+def get_current_data():
+    opLog = models.OperationLog.query.order_by("-id").first()
+    mTime  = unicode(opLog.time)
+    inTemp = unicode(opLog.indoorTemp) + u'°'
+    setPtTemp = unicode(opLog.setpointTemp) + u'°'
+    state = thermoStateStr[opLog.state]
+    
+    wData = models.WeatherData.query.order_by("-id").first()
+    extTemp = unicode(wData.extTemp) + u'°'
+    
+    return jsonify({
+        'inTemp'    : inTemp,
+        'outTemp'   : extTemp,
+        'setPtTemp' : setPtTemp,
+        'opMode'    : state
+    })
 
 @app.route('/')
 @app.route('/index')
+
 def index():
     title = u'Thermostat v0.1'
-    indoorTemp     = u'73.0°'
-    outdoorTemp = u'68.7°'
-    setpointTemp = u'70.0°'
-    opMode = u'OFF'
-    explainStrings = [ #fake array of explain messages
-        u"The set point is 70.0°, because I'm not allowed to make it colder.",
-        u"The operating mode is OFF because it's cooler than 70.0° outside and you should just open a window."
-    ]
-    return render_template(u"index.html", title=title, indoorTemp=indoorTemp, outdoorTemp=outdoorTemp, setpointTemp=setpointTemp, opMode = opMode, explainStrings=explainStrings )
+    return render_template(u"index.html", title=title, explainStrings=[])
