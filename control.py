@@ -221,7 +221,7 @@ while True:
             wLog = models.WeatherData(time=obsTime, extTemp = ext_temp_c)
             db.session.add(wLog)
             db.session.commit()
-    except SQLAlchemy.exc.IntegrityError:
+    except IntegrityError:
         #do nothing - db will already prevent double-add, just catch resulting error
         pass
     finally:
