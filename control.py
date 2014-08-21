@@ -239,7 +239,8 @@ while True:
     setpt = calc_setpoint(ext_temp_c, T_MIN_SETPOINT_C, T_MAX_SETPOINT_C)
     #print '\nsetpoint: \t', setpt
     
-    nextState(temp[1], ext_temp_c, setpt)
+    #TEMP Disable state transitions (remain in init mode) - for no-control experiments
+    #nextState(temp[1], ext_temp_c, setpt)
     
     if iterCount == 0:
         print "Time \t\t\t\tT_int \tT_ext \tT_set \tState"
