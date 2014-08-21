@@ -6,6 +6,7 @@ import socket
 import LIRCCmd
 
 from app import db, models
+from flask.ext.sqlalchemy import SQLAlchemy
 
 #HACK: Redirect stdout to file because regular piping isn't working for some reason.
 f = file('runLog.txt', 'a')
@@ -215,10 +216,15 @@ while True:
     if not ext_temp_c:
         continue
 
-    if not lastObsTime or lastObsTime < obsTime:
-        wLog = models.WeatherData(time=obsTime, extTemp = ext_temp_c)
-        db.session.add(wLog)
-        db.session.commit()
+    try:
+        if not lastObsTime or lastObsTime < obsTime:
+            wLog = models.WeatherData(time=obsTime, extTemp = ext_temp_c)
+            db.session.add(wLog)
+            db.session.commit()
+    except SQLAlchemy.exc.IntegrityError:
+        #do nothing - db will already prevent double-add, just catch resulting error
+        pass
+    finally:
         lastObsTime = obsTime
         
     device_folder = glob.glob('/sys/bus/w1/devices/28*')
