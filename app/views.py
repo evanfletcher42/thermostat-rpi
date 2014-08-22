@@ -2,6 +2,7 @@
 from flask import render_template, jsonify
 from app import app
 from app import db, models
+from sqlalchemy import func
 
 thermoStateStr = {
     0    : u"INIT",
@@ -15,15 +16,20 @@ thermoStateStr = {
     8    : u"HEAT"
 }
 
+#set up query objects
+opLog = models.OperationLog.query.order_by(u"-id").first()
+wData = models.WeatherData.query.order_by(u"-id").first()
+
 @app.route(u'/_get_current_data')
 def get_current_data():
-    opLog = models.OperationLog.query.order_by(u"-id").first()
+    global oplog
+    global wdata
+    
     mTime  = unicode(opLog.time)
     inTemp = unicode("%.1f" % opLog.indoorTemp) + u'°'
     setPtTemp = unicode("%.1f" % opLog.setpointTemp) + u'°'
     state = unicode(thermoStateStr[opLog.state])
     
-    wData = models.WeatherData.query.order_by(u"-id").first()
     extTemp = unicode("%.1f" % wData.extTemp) + u'°'
     
     return jsonify({
