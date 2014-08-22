@@ -2,7 +2,7 @@
 from flask import render_template, jsonify
 from app import app
 from app import db, models
-from sqlalchemy import func
+from sqlalchemy import func, orm
 
 thermoStateStr = {
     0    : u"INIT",
@@ -16,14 +16,17 @@ thermoStateStr = {
     8    : u"HEAT"
 }
 
-#set up query objects
-opLog = models.OperationLog.query.order_by(u"-id").first()
-wData = models.WeatherData.query.order_by(u"-id").first()
+ol0 = orm.aliased(models.OperationLog)
+wd0 = orm.aliased(models.WeatherData)
 
 @app.route(u'/_get_current_data')
 def get_current_data():
-    global oplog
-    global wdata
+    global ol0
+    global wd0
+    
+    #perform query
+    opLog = db.session.query(ol0).filter(ol0.id==db.session.query(ol0).with_entities(func.max(ol0.id)).one()[0])[0]
+    wData = db.session.query(wd0).filter(wd0.id==db.session.query(wd0).with_entities(func.max(wd0.id)).one()[0])[0]
     
     mTime  = unicode(opLog.time)
     inTemp = unicode("%.1f" % opLog.indoorTemp) + u'°'
