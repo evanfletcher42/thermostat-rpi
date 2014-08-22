@@ -8,10 +8,6 @@ import LIRCCmd
 from app import db, models
 from flask.ext.sqlalchemy import SQLAlchemy
 
-#HACK: Redirect stdout to file because regular piping isn't working for some reason.
-f = file('runLog.txt', 'a')
-sys.stdout = f
-
 def cToF(tempC): #function that converts Celsius to Fahrenheit 
     return float(tempC)*9/5 + 32
     
@@ -205,8 +201,6 @@ def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external tem
 	setpoint = min(setpoint, maxSet)
 	return round(setpoint, 2)
 	
-iterCount = 0;
-ITER_REPRINT_HEAD = 30;
 lastObsTime = None
 while True:
     startTime = time.time();
@@ -242,15 +236,9 @@ while True:
     #TEMP Disable state transitions (remain in init mode) - for no-control experiments
     #nextState(temp[1], ext_temp_c, setpt)
     
-    if iterCount == 0:
-        print "Time \t\t\t\tT_int \tT_ext \tT_set \tState"
-    
     opLog = models.OperationLog(time = dt_meas, indoorTemp = temp[1], setpointTemp = setpt, state = state)
     db.session.add(opLog)
     db.session.commit()
-    
-    print str(dt_meas), "\t", temp[1], "\t", ext_temp_c, "\t", setpt, "\t", thermoStateStr[state]
-    iterCount = (iterCount + 1) % ITER_REPRINT_HEAD
-    f.flush()
+     
     time.sleep(max(0,10-(time.time() - startTime)))
 #TODO update the database about all of the above
