@@ -233,8 +233,7 @@ while True:
     setpt = calc_setpoint(ext_temp_c, T_MIN_SETPOINT_C, T_MAX_SETPOINT_C)
     #print '\nsetpoint: \t', setpt
     
-    #TEMP Disable state transitions (remain in init mode) - for no-control experiments
-    #nextState(temp[1], ext_temp_c, setpt)
+    nextState(temp[1], ext_temp_c, setpt)
     
     opLog = models.OperationLog(time = dt_meas, indoorTemp = temp[1], setpointTemp = setpt, state = state)
     db.session.add(opLog)
