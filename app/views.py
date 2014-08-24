@@ -3,6 +3,7 @@ from flask import render_template, jsonify
 from app import app
 from app import db, models
 from sqlalchemy import func, orm
+import LIRCCmd
 
 thermoStateStr = {
     0    : u"INIT",
@@ -19,6 +20,11 @@ thermoStateStr = {
 ol0 = orm.aliased(models.OperationLog)
 wd0 = orm.aliased(models.WeatherData)
 
+@app.route(u'/toggle_on_off')
+def toggle_on_off():
+    LIRCCmd.toggleOnOff()
+    return None
+    
 @app.route(u'/_get_current_data')
 def get_current_data():
     global ol0
@@ -39,7 +45,8 @@ def get_current_data():
         u'inTemp'    : inTemp,
         u'outTemp'   : extTemp,
         u'setPtTemp' : setPtTemp,
-        u'opMode'    : state
+        u'opMode'    : state,
+        u'date'      : mTime
     })
 
 @app.route(u'/')
@@ -47,4 +54,4 @@ def get_current_data():
 
 def index():
     title = u'Thermostat v0.1'
-    return render_template(u"index.html", title=title, explainStrings=[u'Test string'])
+    return render_template(u"index.html", title=title)
