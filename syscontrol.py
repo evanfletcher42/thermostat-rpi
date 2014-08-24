@@ -176,6 +176,7 @@ def cfgCoolMed():
 
 def cfgCoolHigh():
     LIRCCmd.setCoolMode()
+    LIRCCmd.setFanHi()
 
 def cfgHeatOff():
     #TODO heat relay control
