@@ -23,7 +23,7 @@ wd0 = orm.aliased(models.WeatherData)
 @app.route(u'/toggle_on_off')
 def toggle_on_off():
     LIRCCmd.toggleOnOff()
-    return None
+    return jsonify({u'Result':u'Success'})
     
 @app.route(u'/_get_current_data')
 def get_current_data():
