@@ -164,7 +164,7 @@ def cfgCoolOff():
     
 def cfgCoolExt():
     LIRCCmd.setFanMode()
-    LIRCCmd.setFanHigh()
+    LIRCCmd.setFanHi()
 
 def cfgCoolLow():
     LIRCCmd.setCoolMode()
