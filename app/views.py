@@ -4,6 +4,7 @@ from app import app
 from app import db, models
 from sqlalchemy import func, orm
 import LIRCCmd
+from datetime import datetime
 
 thermoStateStr = {
     0    : u"INIT",
@@ -34,19 +35,19 @@ def get_current_data():
     opLog = db.session.query(ol0).filter(ol0.id==db.session.query(ol0).with_entities(func.max(ol0.id)).one()[0])[0]
     wData = db.session.query(wd0).filter(wd0.id==db.session.query(wd0).with_entities(func.max(wd0.id)).one()[0])[0]
     
-    mTime  = unicode(opLog.time)
-    inTemp = unicode("%.1f" % opLog.indoorTemp) + u'°'
-    setPtTemp = unicode("%.1f" % opLog.setpointTemp) + u'°'
+    mTime  = unicode(datetime.now() - opLog.time)
+    inTemp = opLog.indoorTemp
+    setPtTemp = opLog.setpointTemp
     state = unicode(thermoStateStr[opLog.state])
     
-    extTemp = unicode("%.1f" % wData.extTemp) + u'°'
+    extTemp = wData.extTemp
     
     return jsonify({
         u'inTemp'    : inTemp,
         u'outTemp'   : extTemp,
         u'setPtTemp' : setPtTemp,
         u'opMode'    : state,
-        u'date'      : mTime
+        u'dataAge'   : mTime
     })
 
 @app.route(u'/')
