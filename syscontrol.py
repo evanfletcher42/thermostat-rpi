@@ -73,6 +73,8 @@ def tSCoolOff(tInt, tExt, tSet):
     #Do we need to modify the temperature?
     if tInt > tSet:
         if tExt <= tSet:
+            #just let the wind handle things - ac unit fan seems to have little effect
+            LIRCCmd.toggleOnOff()
             return thermoState.COOL_EXT
             
         return thermoState.COOL_HIGH
@@ -83,6 +85,8 @@ def tSCoolExt(tInt, tExt, tSet):
     if tExt <= tSet and tInt > tSet:
         return thermoState.COOL_EXT
 
+    #turn AC unit back on first
+    LIRCCmd.toggleOnOff()
     return thermoState.COOL_OFF
     
 def tSCoolLow(tInt, tExt, tSet):
@@ -100,6 +104,7 @@ def tSCoolHigh(tInt, tExt, tSet):
         
     #check if we should open a window rather than waste power with AC
     if tExt <= tSet:
+        LIRCCmd.toggleOnOff()
         return thermoState.COOL_EXT
      
     return thermoState.COOL_HIGH
@@ -165,8 +170,7 @@ def cfgCoolOff():
     LIRCCmd.setFanLow()
     
 def cfgCoolExt():
-    LIRCCmd.setFanMode()
-    LIRCCmd.setFanHi()
+    #stub - AC unit is off in this state
     pass
 
 def cfgCoolLow():
