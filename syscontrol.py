@@ -86,7 +86,7 @@ def tSCoolExt(tInt, tExt, tSet):
         return thermoState.COOL_EXT
 
     #turn AC unit back on first
-    LIRCCMd.toggleOnOff()
+    LIRCCmd.toggleOnOff()
     return thermoState.COOL_OFF
     
 def tSCoolLow(tInt, tExt, tSet):
@@ -178,7 +178,7 @@ def cfgCoolLow():
     LIRCCmd.setFanLow()
 
 def cfgCoolMed():
-    LIRCCMd.setCoolMode()
+    LIRCCmd.setCoolMode()
     LIRCCmd.setFanMed()
 
 def cfgCoolHigh():
