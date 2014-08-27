@@ -6,7 +6,7 @@ import syscontrol
 
 from app import db, models
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 #The calculated setpoint will be between these two numbers
 T_MAX_SETPOINT_C    = syscontrol.fToC(77)
@@ -31,8 +31,10 @@ while True:
             wLog = models.WeatherData(time=obsTime, extTemp = ext_temp_c)
             db.session.add(wLog)
             db.session.commit()
-    except IntegrityError:
-        #do nothing - db will already prevent double-add, just catch resulting error
+    except IntegrityError, InvalidRequestError:
+        #Clean up from integrity violation
+        db.session.rollback()
+        db.session.commit()
         pass
     finally:
         lastObsTime = obsTime
