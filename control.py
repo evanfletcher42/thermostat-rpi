@@ -3,6 +3,7 @@ import time
 import wunderground
 import thermometer
 import syscontrol
+import os
 
 from app import db, models
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -18,6 +19,11 @@ def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external tem
 	return round(setpoint, 2)
 	
 lastObsTime = None
+
+#ensure the pin controlling the heater is set as output and is off
+os.system("gpio mode 2 out");
+os.system("gpio write 2 0")
+
 while True:
     startTime = time.time();
     

@@ -1,7 +1,7 @@
 #Implements system-level controls. States, state transitions, IR controls, etc.
 #Imported as a module into a high-level controller (which determines setpoint and schedule).
 
-import LIRCCmd
+import LIRCCmd, os
 
 #---- Utility functions ---
 def cToF(tempC): #function that converts Celsius to Fahrenheit 
@@ -18,7 +18,7 @@ T_COOL_HYST_C     = 0.5
 
 #If HEAT mode and temp < setpoint, HEAT will turn on.
 #AC will turn off when temp climbs above setpoint + T_HEAT_THRESH_C
-T_HEAT_HYST_C     = 1
+T_HEAT_HYST_C     = 0.5
 
 #Mode will switch from heat to cool if temperature goes above this
 T_COOL_MODE_C       = fToC(79)
@@ -186,15 +186,15 @@ def cfgCoolHigh():
     LIRCCmd.setFanHi()
 
 def cfgHeatOff():
-    #TODO heat relay control
+    os.system("gpio write 2 0")
     pass
 
 def cfgHeatExt():
-    #TODO heat relay control
+    os.system("gpio write 2 0")
     pass
 
 def cfgHeatOn():
-    #TODO heat relay control
+    os.system("gpio write 2 1")
     pass
 
 # dict mapping states to their config functions
