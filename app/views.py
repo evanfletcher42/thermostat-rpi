@@ -8,13 +8,13 @@ from datetime import datetime
 
 thermoStateStr = {
     0    : u"INIT",
-    1    : u"OFF (C)",
-    2    : u"EXT",
-    3    : u"AC (L)",
-    4    : u"AC (M)",
-    5    : u"AC (H)",
-    6    : u"OFF (H)",
-    7    : u"OFF (Ext)",
+    1    : u"OFF-C",
+    2    : u"EXT-C",
+    3    : u"AC-L",
+    4    : u"AC-M",
+    5    : u"AC-H",
+    6    : u"OFF-H",
+    7    : u"EXT-H",
     8    : u"HEAT"
 }
 
