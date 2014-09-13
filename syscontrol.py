@@ -24,7 +24,7 @@ T_HEAT_HYST_C     = 0.5
 T_COOL_MODE_C       = fToC(79)
 
 #Mode will switch from cool to heat if temperature goes below this
-T_HEAT_MODE_C       = fToC(65)
+T_HEAT_MODE_C       = fToC(68)
 
 #---- State Transition Stuff ---
 
