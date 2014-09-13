@@ -132,7 +132,7 @@ def tSHeatExt(tInt, tExt, tSet):
 def tSHeatOn(tInt, tExt, tSet):
     #check if done heating the place (has hysteresis to allow for air mixing)
     if tInt >= tSet + T_HEAT_HYST_C:
-        return thermoState.COOL_OFF
+        return thermoState.HEAT_OFF
         
     #check if we should open a window rather than waste power with heating
     if tExt >= tSet:
