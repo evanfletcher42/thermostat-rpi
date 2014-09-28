@@ -22,9 +22,9 @@
 					{},									// With no extra parameters
 					function(data)						// And when you get a response
 					{
-						$("#inTemp").text(data.inTemp.toFixed(1)); 	// Write the results into the 
-						$("#outTemp").text(data.outTemp.toFixed(1)); 	// various elements
-						$("#setPtTemp").text(data.setPtTemp.toFixed(1));
+						$("#inTemp").text((data.inTemp*9/5+32).toFixed(1)); 	// Write the results into the 
+						$("#outTemp").text((data.outTemp*9/5+32).toFixed(1)); 	// various elements
+						$("#setPtTemp").text((data.setPtTemp*9/5+32).toFixed(1));
 						$("#opMode").text(data.opMode);
 						$("#lastUpdateTime").text("Updated " + data.dataAge + " ago");
 					});
