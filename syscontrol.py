@@ -61,8 +61,12 @@ thermoStateStr = {
 
 def tSInit(tInt, tExt, tSet):
     #TODO consider weather forecast in initialization
-
-    return thermoState.COOL_OFF
+    
+    #For now, if it's colder outside than inside, go into heat mode.  
+    if tExt < tInt:
+        return thermoState.HEAT_OFF
+    else:
+        return thermoState.COOL_OFF
         
 def tSCoolOff(tInt, tExt, tSet):
     #First check if we should even be in heating mode
