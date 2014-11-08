@@ -61,9 +61,11 @@ print "Preparing to connect. You might need to press the side button..."
 tool.sendline('connect')
 # test for success of connect
 tool.expect('Connection successful.*\[LE\]>')
-tool.sendline('char-write-cmd 0x29 01')
-tool.expect('\[LE\]>')  
 while True:
+    # Enable sensor and wait for a bit for it to turn on
+    tool.sendline('char-write-cmd 0x29 01')
+    tool.expect('\[LE\]>')  
+    time.sleep(0.25)
     
     # Take reading
     tool.sendline('char-read-hnd 0x25')
@@ -74,7 +76,11 @@ while True:
     #print rval
     (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
     print calcAmbT, calcObjT
-
+    
+    # Disable sensor (save power)
+    tool.sendline('char-write-cmd 0x29 00')
+    tool.expect('\[LE\]>')  
+    
     # Wait
     time.sleep(10)
 
