@@ -49,7 +49,7 @@ def calcTmpTarget(objT, ambT):
     Vos = b0 + b1*(Tdie2 - Tref) + b2*pow((Tdie2 - Tref),2)
     fObj = (Vobj2 - Vos) + c2*pow((Vobj2 - Vos),2)
     tObj = pow(pow(Tdie2,4) + (fObj/S),.25)
-    tObj = (tObj - 273.15)
+    tObj = (tObj - 273.15)+3.98744  #Offset because this makes no sense at all
     #print "%.2f C" % tObj
     return (m_tmpAmb, tObj)
 
@@ -73,9 +73,7 @@ while True:
     ambT = floatfromhex(rval[4] + rval[3])
     #print rval
     (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
-    
-    #print raw data from registers for calibration
-    print objT, ambT, calcAmbT, calcObjT
+    print calcAmbT, calcObjT
 
     # Wait
     time.sleep(10)
