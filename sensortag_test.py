@@ -98,6 +98,7 @@ while True:
                 tool.sendline('connect')
                 tool.expect('Connection successful.*\[LE\]>')
                 retry = True
+                continue
             
             # Disable sensor (save power)
             tool.sendline('char-write-cmd 0x29 00')
