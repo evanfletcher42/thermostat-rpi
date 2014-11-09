@@ -27,6 +27,14 @@ def floatfromhex(h):
         pass
     return t
 
+# Bluetooth addresses for SensorTags located around the apartment.
+# System will connect to and poll all of these.  
+
+sensorTagAddrs = {
+    "LivingRoom" :  "B4:99:4C:64:BA:B6",
+    "Kitchen"    :  "B4:99:4C:64:AF:9F",
+    "Bedroom"    :  "B4:99:4C:64:26:80"
+}
 
 # This algorithm borrowed from 
 # http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#Gatt_Server
@@ -53,33 +61,41 @@ def calcTmpTarget(objT, ambT):
     #print "%.2f C" % tObj
     return (m_tmpAmb, tObj)
 
-
-bluetooth_adr = sys.argv[1]
-tool = pexpect.spawn('gatttool -b ' + bluetooth_adr + ' --interactive')
-tool.expect('\[LE\]>')
-print "Preparing to connect. You might need to press the side button..."
-tool.sendline('connect')
-# test for success of connect
-tool.expect('Connection successful.*\[LE\]>')
+#Connect to all devices
+sensorTagConns = {}
+for tag in sensorTagAddrs:
+    tool = pexpect.spawn('gatttool -b ' + sensorTagAddrs[tag] + ' --interactive')
+    tool.expect('\[LE\]>')
+    print "Preparing to connect to", tag, ".  You might need to press the side button..."
+    tool.sendline('connect')
+    tool.expect('Connection successful.*\[LE\]>')
+    sensorTagConns[tag] = tool
+    
 while True:
-    # Enable sensor and wait for a bit for it to turn on
-    tool.sendline('char-write-cmd 0x29 01')
-    tool.expect('\[LE\]>')  
-    time.sleep(0.25)
     
-    # Take reading
-    tool.sendline('char-read-hnd 0x25')
-    tool.expect('descriptor: .*') 
-    rval = tool.after.split()
-    objT = floatfromhex(rval[2] + rval[1])
-    ambT = floatfromhex(rval[4] + rval[3])
-    #print rval
-    (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
-    print calcAmbT, calcObjT
-    
-    # Disable sensor (save power)
-    tool.sendline('char-write-cmd 0x29 00')
-    tool.expect('\[LE\]>')  
+    for tag in sensorTagConns:
+        tool = sensorTagConns[tag]
+        
+        # Enable sensor and wait for a bit for it to turn on
+        tool.sendline('char-write-cmd 0x29 01')
+        tool.expect('\[LE\]>')  
+        time.sleep(0.25)
+        
+        # Take reading
+        tool.sendline('char-read-hnd 0x25')
+        tool.expect('descriptor: .*') 
+        rval = tool.after.split()
+        objT = floatfromhex(rval[2] + rval[1])
+        ambT = floatfromhex(rval[4] + rval[3])
+        #print rval
+        (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
+        print tag, "\tamb=", calcAmbT, "\tIR=", calcObjT
+        
+        # Disable sensor (save power)
+        tool.sendline('char-write-cmd 0x29 00')
+        tool.expect('\[LE\]>')  
+        
+    print
     
     # Wait
     time.sleep(10)
