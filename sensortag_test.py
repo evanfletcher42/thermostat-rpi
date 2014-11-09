@@ -26,7 +26,7 @@ def floatfromhex(h):
         t = -(float.fromhex('FFFF') - t)
         pass
     return t
-
+    
 # Bluetooth addresses for SensorTags located around the apartment.
 # System will connect to and poll all of these.  
 
@@ -81,19 +81,28 @@ while True:
         tool.expect('\[LE\]>')  
         time.sleep(0.25)
         
-        # Take reading
-        tool.sendline('char-read-hnd 0x25')
-        tool.expect('descriptor: .*') 
-        rval = tool.after.split()
-        objT = floatfromhex(rval[2] + rval[1])
-        ambT = floatfromhex(rval[4] + rval[3])
-        #print rval
-        (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
-        print tag, "\tamb=", calcAmbT, "\tIR=", calcObjT
-        
-        # Disable sensor (save power)
-        tool.sendline('char-write-cmd 0x29 00')
-        tool.expect('\[LE\]>')  
+        retry = True
+        while retry:        
+            # Take reading
+            tool.sendline('char-read-hnd 0x25')
+            i = tool.expect(['descriptor: .*', 'Disconnected'])
+            if i == 0:
+                rval = tool.after.split()
+                objT = floatfromhex(rval[2] + rval[1])
+                ambT = floatfromhex(rval[4] + rval[3])
+                #print rval
+                (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
+                print tag, "\tamb=", calcAmbT, "\tIR=", calcObjT
+            else:
+                print "Reconnecting to", tag, "..."
+                tool.sendline('connect')
+                tool.expect('Connection successful.*\[LE\]>')
+                retry = True
+            
+            # Disable sensor (save power)
+            tool.sendline('char-write-cmd 0x29 00')
+            tool.expect('\[LE\]>')
+            retry = False
         
     print
     
