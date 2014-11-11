@@ -45,7 +45,7 @@ def calcTmpTarget(objT, ambT):
     m_tmpAmb = ambT/128.0
     Vobj2 = objT * 0.00000015625
     Tdie2 = m_tmpAmb + 273.15
-    S0 = 2.65241957557825E-14 # Calibration factor
+    S0 = 5.593E-14 # Calibration factor
     a1 = 1.75E-3
     a2 = -1.678E-5
     b0 = -2.94E-5
@@ -114,6 +114,6 @@ while True:
     #print
     
     # Wait
-    time.sleep(10)
+    #time.sleep(10)
 
 
