@@ -58,6 +58,7 @@ def calcTmpTarget(objT, ambT):
     fObj = (Vobj2 - Vos) + c2*(Vobj2 - Vos)**2
     tObj = pow(Tdie2**4 + (fObj/S),.25)
     tObj = (tObj - 273.15) #Convert to Celsius
+    tObj = tObj + 4.72
     return (m_tmpAmb, tObj)
 
 #Connect to all devices
