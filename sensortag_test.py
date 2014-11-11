@@ -72,7 +72,7 @@ for tag in sensorTagAddrs:
     sensorTagConns[tag] = tool
     
 while True:
-    
+    startTime = time.time();
     for tag in sensorTagConns:
         tool = sensorTagConns[tag]
         
@@ -111,9 +111,9 @@ while True:
         tool.expect('\[LE\]>')
         retry = False
         
-    #print
+    print
     
     # Wait
-    #time.sleep(10)
+    time.sleep(max(0,10-(time.time() - startTime)))
 
 
