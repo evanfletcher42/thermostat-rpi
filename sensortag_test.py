@@ -79,8 +79,11 @@ while True:
         # Enable sensor and wait for a bit for it to turn on
         tool.sendline('char-write-cmd 0x29 01')
         tool.expect('\[LE\]>')  
-        time.sleep(0.25)
         
+    time.sleep(0.25)
+        
+    for tag in sensorTagConns:
+        tool = sensorTagConns[tag]
         retry = True
         while retry:        
             # Take reading
@@ -99,11 +102,14 @@ while True:
                 tool.expect('Connection successful.*\[LE\]>')
                 retry = True
                 continue
+            retry = False;
             
-            # Disable sensor (save power)
-            tool.sendline('char-write-cmd 0x29 00')
-            tool.expect('\[LE\]>')
-            retry = False
+    for tag in sensorTagConns:
+        tool = sensorTagConns[tag]
+        # Disable sensor (save power)
+        tool.sendline('char-write-cmd 0x29 00')
+        tool.expect('\[LE\]>')
+        retry = False
         
     print
     
