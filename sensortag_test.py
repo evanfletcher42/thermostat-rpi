@@ -40,12 +40,12 @@ sensorTagAddrs = {
 # http://processors.wiki.ti.com/index.php/SensorTag_User_Guide#Gatt_Server
 # which most likely took it from the datasheet.  I've not checked it, other
 # than noted that the temperature values I got seemed reasonable.
-#
+
 def calcTmpTarget(objT, ambT):
     m_tmpAmb = ambT/128.0
     Vobj2 = objT * 0.00000015625
     Tdie2 = m_tmpAmb + 273.15
-    S0 = 6.4E-14            # Calibration factor
+    S0 = 2.65241957557825E-14 # Calibration factor
     a1 = 1.75E-3
     a2 = -1.678E-5
     b0 = -2.94E-5
@@ -53,12 +53,11 @@ def calcTmpTarget(objT, ambT):
     b2 = 4.63E-9
     c2 = 13.4
     Tref = 298.15
-    S = S0*(1+a1*(Tdie2 - Tref)+a2*pow((Tdie2 - Tref),2))
-    Vos = b0 + b1*(Tdie2 - Tref) + b2*pow((Tdie2 - Tref),2)
-    fObj = (Vobj2 - Vos) + c2*pow((Vobj2 - Vos),2)
-    tObj = pow(pow(Tdie2,4) + (fObj/S),.25)
-    tObj = (tObj - 273.15)+3.98744  #Offset because this makes no sense at all
-    #print "%.2f C" % tObj
+    S = S0*(1+a1*(Tdie2 - Tref)+a2*(Tdie2 - Tref)**2)
+    Vos = b0 + b1*(Tdie2 - Tref) + b2*(Tdie2 - Tref)**2
+    fObj = (Vobj2 - Vos) + c2*(Vobj2 - Vos)**2
+    tObj = pow(Tdie2**4 + (fObj/S),.25)
+    tObj = (tObj - 273.15) #Convert to Celsius
     return (m_tmpAmb, tObj)
 
 #Connect to all devices
@@ -95,8 +94,8 @@ while True:
                 ambT = floatfromhex(rval[4] + rval[3])
                 print objT, ambT
                 #print rval
-                #(calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
-                #print tag, "\tamb=", calcAmbT*9/5+32, "\tIR=", calcObjT*9/5+32
+                (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
+                print tag, "\tamb=", calcAmbT*9/5+32, "\tIR=", calcObjT*9/5+32
             else:
                 print "Reconnecting to", tag, "..."
                 tool.sendline('connect')
@@ -115,6 +114,6 @@ while True:
     #print
     
     # Wait
-    #time.sleep(10)
+    time.sleep(10)
 
 
