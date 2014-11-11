@@ -112,7 +112,7 @@ while True:
         tool.expect('\[LE\]>')
         retry = False
         
-    print
+    #print
     
     # Wait
     #time.sleep(10)
