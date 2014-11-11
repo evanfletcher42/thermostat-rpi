@@ -31,9 +31,9 @@ def floatfromhex(h):
 # System will connect to and poll all of these.  
 
 sensorTagAddrs = {
-    "LivingRoom" :  "B4:99:4C:64:BA:B6"#,
-    #"Kitchen"    :  "B4:99:4C:64:AF:9F",
-    #"Bedroom"    :  "B4:99:4C:64:26:80"
+    "LivingRoom" :  "B4:99:4C:64:BA:B6",
+    "Kitchen"    :  "B4:99:4C:64:AF:9F",
+    "Bedroom"    :  "B4:99:4C:64:26:80"
 }
 
 # This algorithm borrowed from 
@@ -93,7 +93,6 @@ while True:
                 rval = tool.after.split()
                 objT = floatfromhex(rval[2] + rval[1])
                 ambT = floatfromhex(rval[4] + rval[3])
-                print objT, ambT
                 #print rval
                 (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
                 print tag, "\tamb=", calcAmbT*9/5+32, "\tIR=", calcObjT*9/5+32
