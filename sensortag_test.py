@@ -95,7 +95,7 @@ while True:
                 ambT = floatfromhex(rval[4] + rval[3])
                 #print rval
                 (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
-                print tag, "\tamb=", calcAmbT, "\tIR=", calcObjT
+                print tag, "\tamb=", calcAmbT*9/5+32, "\tIR=", calcObjT*9/5+32
             else:
                 print "Reconnecting to", tag, "..."
                 tool.sendline('connect')
