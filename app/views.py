@@ -22,6 +22,11 @@ thermoStateStr = {
 ol0 = orm.aliased(models.OperationLog)
 wd0 = orm.aliased(models.WeatherData)
 
+def unix_time(dt):
+    epoch = datetime.utcfromtimestamp(0)
+    delta = dt - epoch
+    return delta.total_seconds()
+
 @app.route(u'/toggle_on_off')
 def toggle_on_off():
     LIRCCmd.toggleOnOff()
@@ -64,9 +69,9 @@ def get_history():
     
     
     #extract data we care about
-    opLogTimes = [x.time for x in opLog]
+    opLogTimes = [unix_time(x.time) for x in opLog]
     opLogStates = [x.state for x in opLog]
-    wDataTimes = [x.time for x in wData]
+    wDataTimes = [unix_time(x.time) for x in wData]
     wDataTemps = [x.extTemp for x in wData]
     
     return jsonify({
