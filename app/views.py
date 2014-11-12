@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, jsonify
+from flask import render_template, jsonify, request
 from app import app
 from app import db, models
 from sqlalchemy import func, orm
 import LIRCCmd
-from datetime import datetime
+from datetime import datetime, timedelta
 
 thermoStateStr = {
     0    : u"INIT",
@@ -50,6 +50,30 @@ def get_current_data():
         u'dataAge'   : mTime
     })
 
+@app.route(u'/_get_history')
+def get_history():
+    global ol0
+    global wd0
+    
+    h = float(request.args.get('hours'))
+    
+    #perform query
+    opLog = db.session.query(ol0).filter(ol0.time >= datetime.now() - timedelta(hours=h)).all()
+    wData = db.session.query(wd0).filter(wd0.time >= datetime.now() - timedelta(hours=h)).all()
+    
+    #extract data we care about
+    opLogTimes = [x.time for x in opLog]
+    opLogStates = [x.state for x in opLog]
+    wDataTimes = [x.time for x in wData]
+    wDataTemps = [x.extTemp for x in wData]
+    
+    return jsonify({
+        u'opTimes'      : opLogTimes,
+        u'opModes'      : opLogStates,
+        u'extTempTimes' : wDataTimes,
+        u'extTemps'     : wDataTemps
+    })
+    
 @app.route(u'/')
 @app.route(u'/index')
 
