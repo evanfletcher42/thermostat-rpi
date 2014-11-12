@@ -3,6 +3,7 @@ from flask import render_template, jsonify, request
 from app import app
 from app import db, models
 from sqlalchemy import func, orm
+from sqlalchemy.orm import load_only
 import LIRCCmd
 from datetime import datetime, timedelta
 
@@ -58,8 +59,9 @@ def get_history():
     h = float(request.args.get('hours'))
     
     #perform query
-    opLog = db.session.query(ol0).filter(ol0.time >= datetime.now() - timedelta(hours=h)).all()
-    wData = db.session.query(wd0).filter(wd0.time >= datetime.now() - timedelta(hours=h)).all()
+    opLog = db.session.query(ol0).options(load_only("time", "state")).filter(ol0.time >= datetime.now() - timedelta(hours=h)).all()
+    wData = db.session.query(wd0).options(load_only("time", "extTemp")).filter(wd0.time >= datetime.now() - timedelta(hours=h)).all()
+    
     
     #extract data we care about
     opLogTimes = [x.time for x in opLog]
