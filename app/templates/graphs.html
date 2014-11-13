@@ -20,9 +20,10 @@
 						var avgTemps = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 						var avgTempCt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 						var i;
+						var tInit = data.opTimes[0];
 						for(i=0; i < data.opTimes.length; i++)
 						{
-							data.opTimes[i] = data.opTimes[i] - data.opTimes[0];
+							data.opTimes[i] = data.opTimes[i] - tInit;
 							if(data.opModes[i] == 5 || data.opModes[i] == 8)
 							{
 								bins[Math.floor(data.opTimes[i] / 3600) ]++;
@@ -31,9 +32,10 @@
 						}
 						
 						//compute average temperatures for each hour
+						var tInit = data.extTempTimes[0];
 						for(i=0; i < data.extTempTimes.length; i++)
 						{
-							data.extTempTimes[i] = data.extTempTimes[i] - data.extTempTimes[0];
+							data.extTempTimes[i] = data.extTempTimes[i] - tInit;
 							avgTemps[Math.floor(data.extTempTimes[i] / 3600) ] += data.extTemps[i];
 							avgTempCt[Math.floor(data.extTempTimes[i] / 3600) ]++;
 						}
