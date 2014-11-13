@@ -88,7 +88,7 @@ while True:
         while retry:        
             # Take reading
             tool.sendline('char-read-hnd 0x25')
-            i = tool.expect(['descriptor: .*', 'Disconnected'])
+            i = tool.expect(['descriptor: .*', 'Disconnected', '\[LE\]>'])
             if i == 0:
                 rval = tool.after.split()
                 objT = floatfromhex(rval[2] + rval[1])
