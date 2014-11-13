@@ -36,7 +36,7 @@
 						for(i=0; i < data.extTempTimes.length; i++)
 						{
 							data.extTempTimes[i] = data.extTempTimes[i] - tInit;
-							avgTemps[Math.floor(data.extTempTimes[i] / 3600) ] += data.extTemps[i];
+							avgTemps[Math.floor(data.extTempTimes[i] / 3600) ] += data.extTemps[i]*9/5+32;
 							avgTempCt[Math.floor(data.extTempTimes[i] / 3600) ]++;
 						}
 						
@@ -63,7 +63,7 @@
 							}],
 							yAxis: [{ // Primary yAxis
 								labels: {
-									format: '{value} C',
+									format: '{value} F',
 									style: {
 										color: Highcharts.getOptions().colors[1]
 									}
@@ -106,7 +106,7 @@
 								type: 'spline',
 								data: avgTemps,
 								tooltip: {
-									valueSuffix: ' C'
+									valueSuffix: ' F'
 								}
 							}]
 						});
