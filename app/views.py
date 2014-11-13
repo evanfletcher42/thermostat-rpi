@@ -80,6 +80,11 @@ def get_history():
         u'extTempTimes' : wDataTimes,
         u'extTemps'     : wDataTemps
     })
+
+@app.route(u'/graphs')
+def graphs():
+    title = u'Thermostat v0.1'
+    return render_template(u"graphs.html", title=title)
     
 @app.route(u'/')
 @app.route(u'/index')
