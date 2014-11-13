@@ -25,17 +25,17 @@
 							data.opTimes[i] = data.opTimes[i] - data.opTimes[0];
 							if(data.opModes[i] == 5 || data.opModes[i] == 8)
 							{
-								bins[Math.floor(data.opTimes[i] % 3600) ]++;
+								bins[Math.floor(data.opTimes[i] / 3600) ]++;
 							}
-							binCt[Math.floor(data.opTimes[i] % 3600) ]++;
+							binCt[Math.floor(data.opTimes[i] / 3600) ]++;
 						}
 						
 						//compute average temperatures for each hour
 						for(i=0; i < data.extTempTimes.length; i++)
 						{
 							data.extTempTimes[i] = data.extTempTimes[i] - data.extTempTimes[0];
-							avgTemps[Math.floor(data.extTempTimes[i] % 3600) ] += data.extTemps[i];
-							avgTempCt[Math.floor(data.extTempTimes[i] % 3600) ]++;
+							avgTemps[Math.floor(data.extTempTimes[i] / 3600) ] += data.extTemps[i];
+							avgTempCt[Math.floor(data.extTempTimes[i] / 3600) ]++;
 						}
 						
 						//Normalize bins to percentages and average temperatures
