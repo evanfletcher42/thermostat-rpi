@@ -10,15 +10,15 @@
 			function update()
 			{
 				$.getJSON(                            	
-					'/_get_history?hours=12',					
+					'/_get_history?hours=24',					
 					{},									
 					function(data)						
 					{
 						//Fit data into bins
-						var bins = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-						var binCt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-						var avgTemps = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-						var avgTempCt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+						var bins = Array.apply(null, new Array(24)).map(Number.prototype.valueOf,0);
+						var binCt = Array.apply(null, new Array(24)).map(Number.prototype.valueOf,0);
+						var avgTemps = Array.apply(null, new Array(24)).map(Number.prototype.valueOf,0);
+						var avgTempCt = Array.apply(null, new Array(24)).map(Number.prototype.valueOf,0);
 						var i;
 						var tInit = data.opTimes[0];
 						for(i=0; i < data.opTimes.length; i++)
@@ -59,7 +59,7 @@
 								text: 'Calculated from database'
 							},
 							xAxis: [{
-								categories: ["-12h", "-11h", "-10h", "-9h", "-8h", "-7h", "-6h", "-5h", "-4h", "-3h", "-2h", "-1h"]
+								categories: ["-24h", "-23h", "-22h", "-21h", "-20h", "-19h", "-18h", "-17h", "-16h", "-15h", "-14h", "-13h", "-12h", "-11h", "-10h", "-9h", "-8h", "-7h", "-6h", "-5h", "-4h", "-3h", "-2h", "-1h"]
 							}],
 							yAxis: [{ // Primary yAxis
 								labels: {
@@ -91,15 +91,6 @@
 							}],
 							tooltip: {
 								shared: true
-							},
-							legend: {
-								layout: 'vertical',
-								align: 'left',
-								x: 120,
-								verticalAlign: 'top',
-								y: 100,
-								floating: true,
-								backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
 							},
 							series: [{
 								name: 'Duty Cycle',
@@ -138,7 +129,7 @@
 		</div>
 		
 		<!--These should be specific -->
-			<div id="chartContainer" style="min-width: 700px; height: 400px; margin: 0 auto">
+			<div id="chartContainer" style="min-width: 350px; height: 400px; margin: 0 auto">
 			</div>
 		
 	</body>
