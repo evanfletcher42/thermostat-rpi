@@ -1,0 +1,145 @@
+<html>
+	<head>
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+		<script src="http://code.highcharts.com/highcharts.js"></script>
+		<script src="http://code.highcharts.com/modules/exporting.js"></script>
+		
+		<script type=text/javascript>
+			function update()
+			{
+				$.getJSON(                            	
+					'/_get_history?hours=12',					
+					{},									
+					function(data)						
+					{
+						//Fit data into bins
+						var bins = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+						var binCt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+						var avgTemps = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+						var avgTempCt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+						var i;
+						for(i=0; i < data.opTimes.length; i++)
+						{
+							data.opTimes[i] = data.opTimes[i] - data.opTimes[0];
+							if(data.opModes[i] == 5 || data.opModes[i] == 8)
+							{
+								bins[Math.floor(data.opTimes[i] % 3600) ]++;
+								binCt[Math.floor(data.opTimes[i] % 3600) ]++;
+							}
+						}
+						
+						//compute average temperatures for each hour
+						for(i=0; i < data.extTempTimes.length; i++)
+						{
+							data.extTempTimes[i] = data.extTempTimes[i] - data.extTempTimes[0];
+							avgTemps[Math.floor(data.extTempTimes[i] % 3600) ] += data.extTemps[i];
+							avgTempCt[Math.floor(data.extTempTimes[i] % 3600) ]++;
+						}
+						
+						//Normalize bins to percentages and average temperatures
+						for(i = 0; i < bins.length; i++)
+						{
+							bins[i] = bins[i]/binCt[i]*100;
+							avgTemps[i] = avgTemps[i] / avgTempCt[i];
+						}
+						
+						//Format data into chart
+						$('#chartContainer').highcharts({
+							chart: {
+								zoomType: 'xy'
+							},
+							title: {
+								text: 'Ext. Temperature and Duty Cycle'
+							},
+							subtitle: {
+								text: 'Calculated from database'
+							},
+							xAxis: [{
+								categories: ["-12h", "-11h", "-10h", "-9h", "-8h", "-7h", "-6h", "-5h", "-4h", "-3h", "-2h", "-1h"]
+							}],
+							yAxis: [{ // Primary yAxis
+								labels: {
+									format: '{value}°C',
+									style: {
+										color: Highcharts.getOptions().colors[1]
+									}
+								},
+								title: {
+									text: 'Temperature',
+									style: {
+										color: Highcharts.getOptions().colors[1]
+									}
+								}
+							}, { // Secondary yAxis
+								title: {
+									text: 'Duty Cycle',
+									style: {
+										color: Highcharts.getOptions().colors[0]
+									}
+								},
+								labels: {
+									format: '{value}%',
+									style: {
+										color: Highcharts.getOptions().colors[0]
+									}
+								},
+								opposite: true
+							}],
+							tooltip: {
+								shared: true
+							},
+							legend: {
+								layout: 'vertical',
+								align: 'left',
+								x: 120,
+								verticalAlign: 'top',
+								y: 100,
+								floating: true,
+								backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+							},
+							series: [{
+								name: 'Ext. Temperature',
+								type: 'column',
+								yAxis: 1,
+								data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
+								tooltip: {
+									valueSuffix: ' °C'
+								}
+
+							}, {
+								name: 'Temperature',
+								type: 'spline',
+								data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6],
+								tooltip: {
+									valueSuffix: '°C'
+								}
+							}]
+						});
+					});
+					
+				setTimeout(update, 10000)
+			}
+			
+			update();
+		</script>
+		<title>{{ title }}</title>
+	</head>
+	<body>
+		<div id="nav">
+			<ul>
+				<li><a href="index">home</a></li>
+				<li><a href="override">override</a></li>
+				<li><a href="config">config</a></li>
+				<li><a href="schedule">schedule</a></li>
+				<li><a href="graphs">graphs</a></li>
+			</ul>
+		</div>
+		
+		<!--These should be specific -->
+			<div id="chartContainer" style="min-width: 310px; height: 400px; margin: 0 auto">
+			</div>
+		
+	</body>
+</html>
