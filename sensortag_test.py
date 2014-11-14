@@ -60,6 +60,11 @@ def calcTmpTarget(objT, ambT):
     tObj = (tObj - 273.15) #Convert to Celsius
     tObj = tObj + 4.72
     return (m_tmpAmb, tObj)
+    
+def reconnect(tool):
+    print "Reconnecting to", tag, "..."
+    tool.sendline('connect')
+    tool.expect('Connection successful.*\[LE\]>')
 
 #Connect to all devices
 sensorTagConns = {}
@@ -87,8 +92,12 @@ while True:
         retry = True
         while retry:        
             # Take reading
-            tool.sendline('char-read-hnd 0x25')
-            i = tool.expect(['descriptor: .*', 'Disconnected', '\[LE\]>'])
+            try:
+                tool.sendline('char-read-hnd 0x25')
+                i = tool.expect(['descriptor: .*', 'Disconnected'])
+            except:
+                reconnect(tool)
+                continue
             if i == 0:
                 rval = tool.after.split()
                 objT = floatfromhex(rval[2] + rval[1])
@@ -97,10 +106,7 @@ while True:
                 (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
                 print tag, "\tamb=", calcAmbT*9/5+32, "\tIR=", calcObjT*9/5+32
             else:
-                print "Reconnecting to", tag, "..."
-                tool.sendline('connect')
-                tool.expect('Connection successful.*\[LE\]>')
-                retry = True
+                reconnect(tool)
                 continue
             retry = False;
             
