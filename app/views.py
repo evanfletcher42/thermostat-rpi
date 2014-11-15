@@ -64,19 +64,21 @@ def get_history():
     h = float(request.args.get('hours'))
     
     #perform query
-    opLog = db.session.query(ol0).options(load_only("time", "state")).filter(ol0.time >= datetime.now() - timedelta(hours=h)).all()
-    wData = db.session.query(wd0).options(load_only("time", "extTemp")).filter(wd0.time >= datetime.now() - timedelta(hours=h)).all()
+    opLog = db.session.query(ol0).filter(ol0.time >= datetime.now() - timedelta(hours=h)).all()
+    wData = db.session.query(wd0).filter(wd0.time >= datetime.now() - timedelta(hours=h)).all()
     
     
     #extract data we care about
     opLogTimes = [unix_time(x.time) for x in opLog]
     opLogStates = [x.state for x in opLog]
+    opLogTemps = [x.indoorTemp for x in opLog]
     wDataTimes = [unix_time(x.time) for x in wData]
     wDataTemps = [x.extTemp for x in wData]
     
     return jsonify({
         u'opTimes'      : opLogTimes,
         u'opModes'      : opLogStates,
+        u'indTemps'     : opLogTemps,
         u'extTempTimes' : wDataTimes,
         u'extTemps'     : wDataTemps
     })

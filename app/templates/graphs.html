@@ -47,8 +47,15 @@
 							avgTemps[i] = avgTemps[i] / avgTempCt[i];
 						}
 						
+						//Pair up unix time & temperature data
+						var intTempLog = []
+						for(i = 0; i < data.extTempTimes.length; i++)
+						{
+							intTempLog[i] = [data.opTimes[i], data.indTemps[i]];
+						}
+						
 						//Format data into chart
-						$('#chartContainer').highcharts({
+						$('#dutyCycleContainer').highcharts({
 							chart: {
 								zoomType: 'xy'
 							},
@@ -110,6 +117,53 @@
 								}
 							}]
 						});
+						
+						$('#tempLogContainer').highcharts({
+							chart: {
+								zoomType: 'x'
+							},
+							title: {
+								text: 'Indoor temperature, past 24 hours'
+							},
+							xAxis: {
+								text: 'Unix Time'
+							},
+							yAxis: {
+								title: {
+									text: 'Indoor Temperature (F)'
+								}
+							},
+							legend: {
+								enabled: false
+							},
+							plotOptions: {
+								area: {
+									fillColor: {
+										linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+										stops: [
+											[0, Highcharts.getOptions().colors[0]],
+											[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+										]
+									},
+									marker: {
+										radius: 2
+									},
+									lineWidth: 1,
+									states: {
+										hover: {
+											lineWidth: 1
+										}
+									},
+									threshold: null
+								}
+							},
+
+							series: [{
+								type: 'area',
+								name: 'Indoor Temperature (F)',
+								data: intTempLog
+							}]
+						});
 					});
 			}
 			
@@ -128,9 +182,8 @@
 			</ul>
 		</div>
 		
-		<!--These should be specific -->
-			<div id="chartContainer" style="min-width: 350px; height: 400px; margin: 0 auto">
-			</div>
+		<div id="dutyCycleContainer" style="min-width: 350px; height: 400px; margin: 0 auto">Loading...</div>
+		<div id="tempLogContainer" style="min-width: 350px; height: 400px; margin: 0 auto">Loading...</div>
 		
 	</body>
 </html>
