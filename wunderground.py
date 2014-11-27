@@ -16,7 +16,7 @@ def update_weather():
     if time.time() - __lastUpdateTime > __MIN_UPDATE_PERIOD_SECONDS:
         try:
             __lastUpdateTime = time.time()
-            f = urllib2.urlopen('http://api.wunderground.com/api/WUNDERGROUND_API_KEY/conditions/q/pws:KCOBOULD95.json', timeout=1)
+            f = urllib2.urlopen('http://api.wunderground.com/api/WUNDERGROUND_API_KEY/conditions/q/CO/Boulder.json', timeout=1)
             json_string = f.read()
             __last_parsed_json = json.loads(json_string)
             justUpdated = True
