@@ -80,6 +80,8 @@ for tag in sensorTagAddrs:
     tool.expect('Connection successful.*\[LE\]>')
     sensorTagConns[tag] = tool
     
+totalReadTime = 0;
+totalReads = 0;
 while True:
     startTime = time.time();
     for tag in sensorTagConns:
@@ -121,6 +123,9 @@ while True:
         tool.expect('\[LE\]>')
         retry = False
         
+    totalReadTime = totalReadTime + (time.time() - startTime)
+    totalReads = totalReads + 1
+    print "Last read: ", (time.time() - startTime), "s  Avg: ", (totalReadTime/totalReads), "s"
     print
     
     # Wait
