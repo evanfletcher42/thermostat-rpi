@@ -34,7 +34,7 @@
 						var tInit = data.extTempTimes[0];
 						for(i=0; i < data.extTempTimes.length; i++)
 						{
-								avgTemps[Math.floor((data.extTempTimes[i] - tInit) / 3600) ] += data.extTemps[i]*9/5+32;
+							avgTemps[Math.floor((data.extTempTimes[i] - tInit) / 3600) ] += data.extTemps[i]*9/5+32;
 							avgTempCt[Math.floor((data.extTempTimes[i] - tInit) / 3600) ]++;
 						}
 						
@@ -47,9 +47,15 @@
 						
 						//Pair up unix time & temperature data
 						var intTempLog = []
+						var extTempLog = []
 						for(i = 0; i < data.opTimes.length; i++)
 						{
 							intTempLog[i] = [new Date(data.opTimes[i]*1000), data.indTemps[i]*9/5+32];
+						}
+						
+						for(i = 0; i < data.extTempTimes.length; i++)
+						{
+							extTempLog[i] = [new Date(data.extTempTimes[i]*1000), data.extTemps[i]*9/5+32]
 						}
 						
 						//Format data into chart
@@ -121,7 +127,7 @@
 								zoomType: 'x'
 							},
 							title: {
-								text: 'Indoor temperature, past 24 hours'
+								text: 'Indoor & Outdoor Temperature, past 24 hours'
 							},
 							xAxis: {
 								type: 'datetime',
@@ -161,6 +167,10 @@
 								type: 'area',
 								name: 'Indoor Temperature (F)',
 								data: intTempLog
+							},  {
+								type: 'area',
+								name: 'Outdoor Temperature (F)',
+								data: extTempLog
 							}]
 						});
 					});
