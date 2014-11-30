@@ -65,6 +65,10 @@ def reconnect(tool):
     print "Reconnecting to", tag, "..."
     tool.sendline('connect')
     tool.expect('Connection successful.*\[LE\]>')
+    # Enable sensor and wait for a bit for it to turn on
+    tool.sendline('char-write-cmd 0x29 01')
+    tool.expect('\[LE\]>') 
+    time.sleep(0.25)
 
 #Connect to all devices
 sensorTagConns = {}
