@@ -82,6 +82,12 @@ for tag in sensorTagAddrs:
     
 totalReadTime = 0;
 totalReads = 0;
+
+#DEBUG: "cold reads" can appear if a sensortag disconnects.
+# essentially it's a nonsense read from a disabled TMP006, or one that happens before a conversion completes.
+# Some code below seeks to resolve that, but since I can't watch for these happening all the time...
+
+coldReads = 0;
 while True:
     startTime = time.time();
     for tag in sensorTagConns:
@@ -111,6 +117,8 @@ while True:
                 #print rval
                 (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
                 print tag, "\tamb=", calcAmbT*9/5+32, "\tIR=", calcObjT*9/5+32
+                if calcAmbT < 60.0:
+                    coldReads = coldReads + 1
             else:
                 reconnect(tool)
                 continue
@@ -126,6 +134,7 @@ while True:
     totalReadTime = totalReadTime + (time.time() - startTime)
     totalReads = totalReads + 1
     print "Last read: ", (time.time() - startTime), "s  Avg: ", (totalReadTime/totalReads), "s"
+    print "Cold Reads:", coldReads
     print
     
     # Wait
