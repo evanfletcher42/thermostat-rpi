@@ -117,7 +117,7 @@ while True:
                 #print rval
                 (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
                 print tag, "\tamb=", calcAmbT*9/5+32, "\tIR=", calcObjT*9/5+32
-                if calcAmbT < 60.0:
+                if calcAmbT*9/5+32 < 60.0:
                     coldReads = coldReads + 1
             else:
                 reconnect(tool)
