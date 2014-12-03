@@ -165,7 +165,7 @@
 								enabled: false
 							},
 							plotOptions: {
-								area: {
+								spline: {
 									marker: {
 										radius: 2
 									},
@@ -181,11 +181,11 @@
 
 							series: [
 							{
-								type: 'area',
+								type: 'spline',
 								name: 'Indoor Temperature (F)',
 								data: intTempLog
 							}, {
-								type: 'area',
+								type: 'spline',
 								name: 'Outdoor Temperature (F)',
 								yAxis: 1,
 								data: extTempLog
