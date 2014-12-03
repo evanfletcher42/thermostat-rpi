@@ -52,6 +52,12 @@
 							intTempLog[i] = [new Date(data.opTimes[i]*1000), data.indTemps[i]*9/5+32];
 						}
 						
+						var extTempLog = []
+						for(i = 0; i < data.extTempTimes.length; i++)
+						{
+							extTempLog[i] = [new Date(data.extTempTimes[i]*1000), data.extTemps[i]*9/5+32];
+						}
+						
 						//Format data into chart
 						$('#dutyCycleContainer').highcharts({
 							chart: {
@@ -137,13 +143,6 @@
 							},
 							plotOptions: {
 								area: {
-									fillColor: {
-										linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
-										stops: [
-											[0, Highcharts.getOptions().colors[0]],
-											[1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-										]
-									},
 									marker: {
 										radius: 2
 									},
@@ -157,10 +156,15 @@
 								}
 							},
 
-							series: [{
+							series: [
+							{
 								type: 'area',
 								name: 'Indoor Temperature (F)',
 								data: intTempLog
+							}, {
+								type: 'area',
+								name: 'Outdoor Temperature (F)',
+								data: extTempLog
 							}]
 						});
 					});
