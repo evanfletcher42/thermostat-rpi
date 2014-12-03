@@ -176,12 +176,24 @@
 										}
 									},
 									threshold: null
+								}, 
+								area: {
+									marker: {
+										radius: 2
+									},
+									lineWidth: 1,
+									states: {
+										hover: {
+											lineWidth: 1
+										}
+									},
+									threshold: null
 								}
 							},
 
 							series: [
 							{
-								type: 'spline',
+								type: 'area',
 								name: 'Indoor Temperature (F)',
 								data: intTempLog
 							}, {
