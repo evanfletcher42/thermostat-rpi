@@ -80,7 +80,7 @@
 									}
 								},
 								title: {
-									text: 'Temperature',
+									text: 'Ext. Temperature',
 									style: {
 										color: Highcharts.getOptions().colors[1]
 									}
@@ -127,21 +127,39 @@
 								zoomType: 'x'
 							},
 							title: {
-								text: 'Indoor temperature, past 24 hours'
+								text: 'Indoor & Outdoor Temperature, past 24 hours'
 							},
 							xAxis: {
 								type: 'datetime',
 								text: 'Date'
 							},
-							yAxis: [{
+							yAxis: [{ // Primary yAxis
+								labels: {
+									format: '{value} F',
+									style: {
+										color: Highcharts.getOptions().colors[0]
+									}
+								},
 								title: {
-									text: 'Indoor Temperature (F)'
+									text: 'Indoor Temperature',
+									style: {
+										color: Highcharts.getOptions().colors[0]
+									}
 								}
-							},
-							{
+							}, { // Secondary yAxis
 								title: {
-									text: 'Outdoor Temperature (F)'
-								}
+									text: 'Outdoor Temperature',
+									style: {
+										color: Highcharts.getOptions().colors[1]
+									}
+								},
+								labels: {
+									format: '{value} F',
+									style: {
+										color: Highcharts.getOptions().colors[1]
+									}
+								},
+								opposite: true
 							}],
 							legend: {
 								enabled: false
