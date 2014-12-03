@@ -49,13 +49,13 @@
 						var intTempLog = []
 						for(i = 0; i < data.opTimes.length; i++)
 						{
-							intTempLog[i] = [new Date(data.opTimes[i]*1000), data.indTemps[i]*9/5+32];
+							intTempLog[i] = [data.opTimes[i]*1000, data.indTemps[i]*9/5+32];
 						}
 						
 						var extTempLog = []
 						for(i = 0; i < data.extTempTimes.length; i++)
 						{
-							extTempLog[i] = [new Date(data.extTempTimes[i]*1000), data.extTemps[i]*9/5+32];
+							extTempLog[i] = [data.extTempTimes[i]*1000, data.extTemps[i]*9/5+32];
 						}
 						
 						//Format data into chart
