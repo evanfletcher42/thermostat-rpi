@@ -133,11 +133,16 @@
 								type: 'datetime',
 								text: 'Date'
 							},
-							yAxis: {
+							yAxis: [{
 								title: {
 									text: 'Indoor Temperature (F)'
 								}
 							},
+							{
+								title: {
+									text: 'Outdoor Temperature (F)'
+								}
+							}]
 							legend: {
 								enabled: false
 							},
@@ -164,6 +169,7 @@
 							}, {
 								type: 'area',
 								name: 'Outdoor Temperature (F)',
+								yAxis: 1,
 								data: extTempLog
 							}]
 						});
