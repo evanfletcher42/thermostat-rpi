@@ -17,6 +17,7 @@
 		
 			function update()
 			{
+				startTime = Date.now();
 				$.getJSON(                            	// Get some values from the server
 					'/_get_current_data',				// At this URL
 					{},									// With no extra parameters
@@ -29,7 +30,7 @@
 						$("#lastUpdateTime").text("Updated " + data.dataAge + " ago");
 					});
 					
-				setTimeout(update, 10000)
+				setTimeout(update, 10000 - (Date.now() - startTime));
 			}
 			
 			update();
