@@ -45,7 +45,13 @@ while True:
     finally:
         lastObsTime = obsTime
         
-    temp = thermometer.read_temp() #get the air & board temperatures
+    #4x oversample air temp reading
+    temp = 0
+    for i in range(0, 4):
+        temp += thermometer.read_temp()[1]
+        
+    temp = float(temp)/4
+        
     dt_meas = datetime.now()
     #print 'meas time: \t', str(dt_meas)
     #print 'int temp:  \t', temp[1]
@@ -55,10 +61,10 @@ while True:
     #print '\nsetpoint: \t', setpt
     
     #update the system state (see syscontrol.py)
-    syscontrol.nextState(temp[1], ext_temp_c, setpt)
+    syscontrol.nextState(temp, ext_temp_c, setpt)
     
     #record stuff in database
-    opLog = models.OperationLog(time = dt_meas, indoorTemp = temp[1], setpointTemp = setpt, state = syscontrol.state)
+    opLog = models.OperationLog(time = dt_meas, indoorTemp = temp, setpointTemp = setpt, state = syscontrol.state)
     db.session.add(opLog)
     db.session.commit()
      
