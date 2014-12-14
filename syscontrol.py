@@ -18,7 +18,7 @@ T_COOL_HYST_C     = 0.5
 
 #If HEAT mode and temp < setpoint, HEAT will turn on.
 #AC will turn off when temp climbs above setpoint + T_HEAT_THRESH_C
-T_HEAT_HYST_C     = 0.25
+T_HEAT_HYST_C     = 0.0
 
 #Mode will switch from heat to cool if temperature goes above this
 T_COOL_MODE_C       = fToC(79)
