@@ -45,11 +45,15 @@
 							avgTemps[i] = avgTemps[i] / avgTempCt[i];
 						}
 						
-						//Pair up unix time & temperature data
+						//Pair up unix time & temperature data, and color points based on heating/cooling
 						var intTempLog = []
 						for(i = 0; i < data.opTimes.length; i++)
 						{
-							intTempLog[i] = [data.opTimes[i]*1000, data.indTemps[i]*9/5+32];
+							intTempLog[i] = {x: data.opTimes[i]*1000, y: data.indTemps[i]*9/5+32, color: 'gray'};
+							if(data.opModes[i] == 8)
+								intTempLog[i].color = 'red';
+							else if(data.opModes[i] == 5)
+								intTempLog[i].color = 'blue';
 						}
 						
 						var extTempLog = []
@@ -195,10 +199,12 @@
 							{
 								type: 'area',
 								name: 'Indoor Temperature (F)',
+								turboThreshold: 0,
 								data: intTempLog
 							}, {
 								type: 'spline',
 								name: 'Outdoor Temperature (F)',
+								turboThreshold: 0,
 								yAxis: 1,
 								data: extTempLog
 							}]
