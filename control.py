@@ -10,8 +10,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 #The calculated setpoint will be between these two numbers
-T_MAX_SETPOINT_C    = syscontrol.fToC(77)
-T_MIN_SETPOINT_C    = syscontrol.fToC(70)
+T_MAX_SETPOINT_C    = syscontrol.fToC(90)
+T_MIN_SETPOINT_C    = syscontrol.fToC(50)
 
 def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external temperature
 	setpoint = max(minSet, extTemp)
