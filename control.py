@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 #The calculated setpoint will be between these two numbers
 T_MAX_SETPOINT_C     = syscontrol.fToC(90)
-T_MIN_SETPOINT_C_LOW = syscontrol.fToC(50)
+T_MIN_SETPOINT_C_LOW = syscontrol.fToC(65)
 T_MIN_SETPOINT_C     = syscontrol.fToC(70)
 
 def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external temperature
