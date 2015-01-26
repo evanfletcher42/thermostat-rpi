@@ -10,8 +10,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 #The calculated setpoint will be between these two numbers
-T_MAX_SETPOINT_C     = syscontrol.fToC(90)
-T_MIN_SETPOINT_C_LOW = syscontrol.fToC(65)
+T_MAX_SETPOINT_C     = syscontrol.fToC(77)
 T_MIN_SETPOINT_C     = syscontrol.fToC(70)
 
 def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external temperature
@@ -57,13 +56,8 @@ while True:
     #print 'meas time: \t', str(dt_meas)
     #print 'int temp:  \t', temp[1]
     #print 'sys temp:  \t', temp[0]
-
-    lowsetpoint = T_MIN_SETPOINT_C_LOW
-    #TEMP: Set heat back up to 70 when we get back from traveling. 
-    if dt_meas > datetime(2014, 12, 30):
-        lowsetpoint = T_MIN_SETPOINT_C
     
-    setpt = calc_setpoint(ext_temp_c, lowsetpoint, T_MAX_SETPOINT_C)
+    setpt = calc_setpoint(ext_temp_c, T_MIN_SETPOINT_C, T_MAX_SETPOINT_C)
     #print '\nsetpoint: \t', setpt
     
     #update the system state (see syscontrol.py)
