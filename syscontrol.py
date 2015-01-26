@@ -64,8 +64,10 @@ def tSInit(tInt, tExt, tSet):
     
     #For now, if it's colder outside than inside, go into heat mode.  
     if tExt < tInt:
+        print "syscontrol: Starting in OFF-H"
         return thermoState.HEAT_OFF
     else:
+        print "syscontrol: Starting in OFF-C"
         return thermoState.COOL_OFF
         
 def tSCoolOff(tInt, tExt, tSet):

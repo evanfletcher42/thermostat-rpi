@@ -21,8 +21,12 @@ def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external tem
 lastObsTime = None
 
 #ensure the pin controlling the heater is set as output and is off
+print "Set up GPIO...",
 os.system("gpio mode 2 out");
 os.system("gpio write 2 0")
+print "Done"
+
+print "System running"
 
 while True:
     startTime = time.time();
@@ -39,8 +43,10 @@ while True:
             db.session.commit()
     except IntegrityError, InvalidRequestError:
         #Clean up from integrity violation
+        print "Cleaning up DB integrity violation...",
         db.session.rollback()
         db.session.commit()
+        print "Done"
         pass
     finally:
         lastObsTime = obsTime
