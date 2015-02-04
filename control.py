@@ -31,13 +31,18 @@ print "System running"
 while True:
     startTime = time.time();
     
+    obsTime = None
+    ext_temp_c = None
+    
     #pull current weather from wunderground.
-    (obsTime, ext_temp_c) = wunderground.getTempC()
-    if not ext_temp_c:
-        continue
+    wgdata = wunderground.getTempC()
+    if wgdata:
+        (obsTime, ext_temp_c) = wgdata
+    else:
+        print "control: wunderground returned None"
 
     try:
-        if not lastObsTime or lastObsTime < obsTime:
+        if wgdata and (not lastObsTime or lastObsTime < obsTime):
             wLog = models.WeatherData(time=obsTime, extTemp = ext_temp_c)
             db.session.add(wLog)
             db.session.commit()
@@ -49,7 +54,8 @@ while True:
         print "Done"
         pass
     finally:
-        lastObsTime = obsTime
+        if obsTime:
+            lastObsTime = obsTime
         
     #4x oversample air temp reading
     temp = 0
