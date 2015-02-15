@@ -26,10 +26,10 @@
 						//process and write into the various elements.
 						$("#inTemp").text((data.inTemp*9/5+32).toFixed(1)); 	
 						var inTempTime = 	new Date(data.inTempTime*1000);
-						$("#inTempTime").text("Indoor updated at " + inTempTime.toISOString());
+						$("#inTempTime").text("Indoor updated at " + inTempTime.format("m-d-y h:i:s a"));
 						$("#outTemp").text((data.outTemp*9/5+32).toFixed(1));
 						var outTempTime = 	new Date(data.outTempTime*1000);
-						$("#outTempTime").text("Outdoor updated at " + outTempTime.toISOString());
+						$("#outTempTime").text("Outdoor updated at " + outTempTime.format("m-d-y h:i:s a"));
 						$("#setPtTemp").text((data.setPtTemp*9/5+32).toFixed(1));
 						$("#opMode").text(data.opMode);
 					});
