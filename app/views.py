@@ -47,7 +47,7 @@ def get_current_data():
     state = unicode(thermoStateStr[opLog.state])
     
     extTemp = wData.extTemp
-    extTempTime = wData.time
+    extTempTime = unix_time(wData.time)
     
     return jsonify({
         u'inTemp'      : inTemp,
