@@ -41,19 +41,21 @@ def get_current_data():
     opLog = db.session.query(ol0).filter(ol0.id==db.session.query(ol0).with_entities(func.max(ol0.id)).one()[0])[0]
     wData = db.session.query(wd0).filter(wd0.id==db.session.query(wd0).with_entities(func.max(wd0.id)).one()[0])[0]
     
-    mTime  = unicode(datetime.now() - opLog.time)
+    mTime  = unix_time(opLog.time)
     inTemp = opLog.indoorTemp
     setPtTemp = opLog.setpointTemp
     state = unicode(thermoStateStr[opLog.state])
     
     extTemp = wData.extTemp
+    extTempTime = wData.time
     
     return jsonify({
-        u'inTemp'    : inTemp,
-        u'outTemp'   : extTemp,
-        u'setPtTemp' : setPtTemp,
-        u'opMode'    : state,
-        u'dataAge'   : mTime
+        u'inTemp'      : inTemp,
+        u'inTempTime'  : mTime,
+        u'outTemp'     : extTemp,
+        u'outTempTime' : extTempTime,
+        u'setPtTemp'   : setPtTemp,
+        u'opMode'      : state
     })
 
 @app.route(u'/_get_history')

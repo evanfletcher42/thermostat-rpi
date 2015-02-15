@@ -23,11 +23,15 @@
 					{},									// With no extra parameters
 					function(data)						// And when you get a response
 					{
-						$("#inTemp").text((data.inTemp*9/5+32).toFixed(1)); 	// Write the results into the 
-						$("#outTemp").text((data.outTemp*9/5+32).toFixed(1)); 	// various elements
+						//process and write into the various elements.
+						$("#inTemp").text((data.inTemp*9/5+32).toFixed(1)); 	
+						var inTempTime = 	new Date(data.inTempTime);
+						$("#inTempTime").text("Indoor updated at " + inTempTime.getHours() + ":" + inTempTime.getMinutes() + ":" + inTempTime.getSeconds());
+						$("#outTemp").text((data.outTemp*9/5+32).toFixed(1));
+						var outTempTime = 	new Date(data.extTempTime);
+						$("#outTempTime").text("Outdoor updated at " + outTempTime.getHours() + ":" + outTempTime.getMinutes() + ":" + outTempTime.getSeconds());
 						$("#setPtTemp").text((data.setPtTemp*9/5+32).toFixed(1));
 						$("#opMode").text(data.opMode);
-						$("#lastUpdateTime").text("Updated " + data.dataAge + " ago");
 					});
 					
 				setTimeout(update, 10000 - (Date.now() - startTime));
@@ -70,7 +74,8 @@
 		
 		<!--This should  be a for loop iterating through an arbitrary number of messages.-->
 		<div id="explainContainer">
-			<p class='explainString' id='lastUpdateTime'>Waiting for update...</p>
+			<p class='explainString' id='inTempTime'>Waiting for internal temp update...</p>
+			<p class='explainString' id='outTempTime'>Waiting for external temp update...</p>
 			<p class='explainString'><a id='toggleOnOff' href='#'>Send On/Stop</a></p>
 		</div>
 	</body>
