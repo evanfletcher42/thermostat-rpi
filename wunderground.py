@@ -35,5 +35,8 @@ def getTempC():
         except KeyError as e:
             print type(e)
             return None
+        except TypeError as e:
+            print type(e)
+            return None
     else:
         return None
