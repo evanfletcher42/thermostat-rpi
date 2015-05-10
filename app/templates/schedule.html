@@ -5,6 +5,45 @@
 		<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
 		<script src="{{url_for('static', filename='jquery.timepicker.min.js')}}"></script>		
 		
+		<title>{{ title }}</title>
+	</head>
+	
+	<body>
+		<div id="nav">
+			<ul>
+				<li><a href="index">home</a></li>
+				<li><a href="override">override</a></li>
+				<li><a href="config">config</a></li>
+				<li><a href="schedule">schedule</a></li>
+				<li><a href="graphs">graphs</a></li>
+			</ul>
+		</div>
+		
+		<div>
+			<div style="width: 49%; float: left;"> <b>System Schedule</b>
+				<table border="0">
+					<thead>
+						<tr>
+							<th>Day / Time</th>
+							<th>Low Temp</th>
+							<th>High Temp</th>
+							<th><a href="javascript:void(0)" onclick="AddRowTop()">Insert Top</a>
+
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td> <input type="text" size=10> </td>
+							<td> <input type="text" size=1>  </td>
+							<td> <input type="text" size=1>  </td>
+							<td> <a href="#" class="insert">Insert Below</a> </td>
+							<td> <a href="#" class="remove">Remove</a> </td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 		<script type=text/javascript>
 			SetColor(); //set the table colors (alternating white/grey rows)
 
@@ -46,60 +85,23 @@
 			// How to insert row at end of table
 			function AddRowBottom() {
 				$('table').append($('table tbody tr:last').clone());
+				console.log('Added row to bottom');
 				SetColor();
 			}
 
 			// Insert a row below the clicked element
 			function InsertRowBelow(element) {
 				$(element).closest("tr").after($(element).closest("tr").clone());
+				console.log('Inserted row');
 				SetColor();
 			}
 
 			// How to insert row at top of table
 			function AddRowTop() {
 				$('table').prepend($('table tbody tr:first').clone());
+				console.log('Added row to top');
 				SetColor();
 			}
 		</script>
-		<title>{{ title }}</title>
-	</head>
-	
-	<body>
-		<div id="nav">
-			<ul>
-				<li><a href="index">home</a></li>
-				<li><a href="override">override</a></li>
-				<li><a href="config">config</a></li>
-				<li><a href="schedule">schedule</a></li>
-				<li><a href="graphs">graphs</a></li>
-			</ul>
-		</div>
-		
-		<div>
-			<div style="width: 49%; float: left;"> <b>System Schedule</b>
-				<table border="0">
-					<thead>
-						<tr>
-							<th>Day / Time</th>
-							<th>Low Temp</th>
-							<th>High Temp</th>
-							<th><a href="javascript:void(0)" onclick="AddRowTop()">Insert Top</a>
-
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td> <input type="text" size=10> </td>
-							<td> <input type="text" size=1>  </td>
-							<td> <input type="text" size=1>  </td>
-							<td> <a href="#" class="insert">Insert Below</a> </td>
-							<td> <a href="#" class="remove">Remove</a> </td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-		
 	</body>
 </html>
