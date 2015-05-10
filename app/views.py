@@ -90,6 +90,11 @@ def graphs():
     title = u'Thermostat v0.1'
     return render_template(u"graphs.html", title=title)
     
+@app.route(u'/schedule')
+def schedule():
+    title = u'Thermostat v0.1'
+    return render_template(u"schedule.html", title=title)
+    
 @app.route(u'/')
 @app.route(u'/index')
 
