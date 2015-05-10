@@ -25,7 +25,8 @@
 				<table border="0">
 					<thead>
 						<tr>
-							<th>Day / Time</th>
+							<th>Day</th>
+							<th>Time</th>
 							<th>Low Temp</th>
 							<th>High Temp</th>
 							<th><a href="javascript:void(0)" onclick="AddRowTop()">Insert Top</a>
@@ -35,7 +36,17 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td> <input id="daytimepicker" type="text" class="time" />  
+							<td>
+								<select>
+									<option value="0">Sunday</option>
+									<option value="0">Monday</option>
+									<option value="0">Tuesday</option>
+									<option value="0">Wednesday</option>
+									<option value="0">Thursday</option>
+									<option value="0">Friday</option>
+									<option value="0">Saturday</option>
+								</select>
+							<td> <input id="daytimepicker" type="text" class="time" size=6/>  
 								<script> 
 									$(function() { 
 										$('#daytimepicker').timepicker({ 'step': 15 }); 
