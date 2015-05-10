@@ -4,7 +4,8 @@
 		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='jquery.timepicker.css') }}">
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		<script>window.jQuery || document.write('<script src="{{url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
-		<script src="{{url_for('static', filename='jquery.timepicker.min.js')}}"></script>		
+		<script src="{{url_for('static', filename='jquery.timepicker.min.js')}}"></script>
+		<script src="{{url_for('static', filename='jquery.tablesorter.min.js')}}"></script>
 		
 		<title>{{ title }}</title>
 	</head>
@@ -22,7 +23,7 @@
 		
 		<div>
 			<div id="explainContainer"> <b>System Schedule</b>
-				<table border="0">
+				<table id="scheduleTable" border="0">
 					<thead>
 						<tr>
 							<th>Day</th>
@@ -37,7 +38,7 @@
 					<tbody>
 						<tr>
 							<td>
-								<select>
+								<select id="daypicker">
 									<option value="0">Sunday</option>
 									<option value="0">Monday</option>
 									<option value="0">Tuesday</option>
@@ -46,10 +47,10 @@
 									<option value="0">Friday</option>
 									<option value="0">Saturday</option>
 								</select>
-							<td> <input id="daytimepicker" type="text" class="time" size=6/>  
+							<td> <input id="timepicker" type="text" class="time" size=6/>  
 								<script> 
 									$(function() { 
-										$('#daytimepicker').timepicker({ 'step': 15 }); 
+										$('#timepicker').timepicker({ 'step': 15 }); 
 									}); 
 								</script>
 							</td>
@@ -75,7 +76,7 @@
 			$("body").on("click", ".insert", function () {
 				InsertRowBelow(this);
 			});
-
+			
 			// html table odd even row color
 			function SetColor() {
 				$("tr:odd").css("background-color", "#eee");
@@ -97,15 +98,25 @@
 			function AddRowBottom() {
 				var newRow = $('table tbody tr:last').clone();
 				$('table').append(newRow);
-				newRow.find('#daytimepicker').timepicker({ 'step': 15 }); 
+				newRow.find('#timepicker').timepicker({ 'step': 15, 'timeFormat':'H:i'  }); 
+				callback = function(table){
+					alert('new sort applied 1');
+				};
+				$('#scheduleTable').trigger("update", [true, callback]);
+				$('#scheduleTable').trigger("updateCache");
 				SetColor();
 			}
 
 			// Insert a row below the clicked element
 			function InsertRowBelow(element) {
 				var newRow = $(element).closest("tr").clone();
-				newRow.find('#daytimepicker').timepicker({ 'step': 15 });
+				newRow.find('#timepicker').timepicker({ 'step': 15, 'timeFormat':'H:i'  });
 				$(element).closest("tr").after(newRow);
+				callback = function(table){
+					alert('new sort applied 2');
+				};
+				$('#scheduleTable').trigger("update", [true, callback]);
+				$('#scheduleTable').trigger("updateCache");
 				SetColor();
 			}
 
@@ -113,9 +124,43 @@
 			function AddRowTop() {
 				var newRow = $('table tbody tr:last').clone();
 				$('table').prepend(newRow);
-				newRow.find('#daytimepicker').timepicker({ 'step': 15 }); 
+				newRow.find('#timepicker').timepicker({ 'step': 15, 'timeFormat':'H:i' }); 
+				callback = function(table){
+					alert('new sort applied 3');
+				};
+				$('#scheduleTable').trigger("update", [true, callback]);
+				$('#scheduleTable').trigger("updateCache");
 				SetColor();
 			}
+			
+			var sortTextExtract = function(node) {
+				return node.childNodes[0].value; 
+			} 
+			
+			$(document).ready(function() 
+			{ 
+				$("#scheduleTable").tablesorter( {sortList: [[0,1], [1,0]], textExtraction: sortTextExtract} ); 
+				
+				$('#daypicker').change(function() {
+					$("#scheduleTable").trigger("sorton", [[1,0], [2,0]]); 
+					callback = function(table){
+						alert('new sort applied daypicker');
+					};
+					$('#scheduleTable').trigger("update", [true, callback]);
+					$('#scheduleTable').trigger("updateCache");
+					
+				});
+				
+				$('#timepicker').change(function() {
+					$("#scheduleTable").trigger("sorton", [[1,0], [2,0]]); 
+					callback = function(table){
+						alert('new sort applied timepicker');
+					};
+					$('#scheduleTable').trigger("update", [true, callback]);
+					$('#scheduleTable').trigger("updateCache");
+				});
+			} 
+); 
 		</script>
 	</body>
 </html>
