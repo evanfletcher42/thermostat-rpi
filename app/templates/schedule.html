@@ -77,21 +77,18 @@
 			// How to insert row at end of table
 			function AddRowBottom() {
 				$('table').append($('table tbody tr:last').clone());
-				console.log('Added row to bottom');
 				SetColor();
 			}
 
 			// Insert a row below the clicked element
 			function InsertRowBelow(element) {
 				$(element).closest("tr").after($(element).closest("tr").clone());
-				console.log('Inserted row');
 				SetColor();
 			}
 
 			// How to insert row at top of table
 			function AddRowTop() {
 				$('table').prepend($('table tbody tr:first').clone());
-				console.log('Added row to top');
 				SetColor();
 			}
 		</script>
