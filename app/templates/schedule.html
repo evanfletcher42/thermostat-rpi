@@ -35,7 +35,13 @@
 					</thead>
 					<tbody>
 						<tr>
-							<td> <input id="daytimepicker" type="text" class="time" /> </td>
+							<td> <input id="daytimepicker" type="text" class="time" />  
+								<script> 
+									$(function() { 
+										$('#daytimepicker').timepicker({ 'step': 15 }); 
+									}); 
+								</script>
+							</td>
 							<td> <input type="text" size=1 />  </td>
 							<td> <input type="text" size=1 />  </td>
 							<td> <a href="#" class="insert">Insert Below</a> </td>
@@ -45,12 +51,6 @@
 				</table>
 			</div>
 		</div>
-		
-		<script> 
-			$(function() { 
-				$('#daytimepicker').timepicker({ 'step': 15 }); 
-			}); 
-		</script>
 		
 		<script type=text/javascript>
 			SetColor(); //set the table colors (alternating white/grey rows)
@@ -84,19 +84,25 @@
 
 			// How to insert row at end of table
 			function AddRowBottom() {
-				$('table').append($('table tbody tr:last').clone());
+				var newRow = $('table tbody tr:last').clone();
+				$('table').append(newRow);
+				newRow.find('#daytimepicker').timepicker({ 'step': 15 }); 
 				SetColor();
 			}
 
 			// Insert a row below the clicked element
 			function InsertRowBelow(element) {
-				$(element).closest("tr").after($(element).closest("tr").clone());
+				var newRow = $(element).closest("tr").clone();
+				newRow.find('#daytimepicker').timepicker({ 'step': 15 });
+				$(element).closest("tr").after(newRow);
 				SetColor();
 			}
 
 			// How to insert row at top of table
 			function AddRowTop() {
-				$('table').prepend($('table tbody tr:first').clone());
+				var newRow = $('table tbody tr:last').clone();
+				$('table').prepend(newRow);
+				newRow.find('#daytimepicker').timepicker({ 'step': 15 }); 
 				SetColor();
 			}
 		</script>
