@@ -47,14 +47,6 @@
 		<script type=text/javascript>
 			SetColor(); //set the table colors (alternating white/grey rows)
 
-			//highlight on hover (TODO - does not work?)
-			$('body').on('hover', 'tr', function () {
-				$(this).css('background-color', '#FFEFC6');
-				console.log('tr hover');
-			}, function () {
-				SetColor();
-			});
-
 			// Remove table row after clicking table row delete button
 			$("body").on("click", ".remove", function () {
 				RemoveTableRow(this);
