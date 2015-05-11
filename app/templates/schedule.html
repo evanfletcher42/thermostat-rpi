@@ -98,7 +98,6 @@
 				for(var i=0, len=tbl.rows.length; i<len; i++){
 					var row = tbl.rows[i];
 					var sortnr = $($(row.cells[1]).children()[0]).timepicker('getSecondsFromMidnight') + 1000000*parseInt($($(row.cells[0]).children()[0]).val());
-					console.log('sort: '+sortnr);
 					if(!isNaN(sortnr)) store.push([sortnr, row]);
 				}
 				store.sort(function(x,y){
