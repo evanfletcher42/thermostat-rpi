@@ -22,7 +22,7 @@
 		
 		<div>
 			<div id="explainContainer"> <b>System Schedule</b>
-				<table border="0">
+				<table id="scheduleTable" border="0">
 					<thead>
 						<tr>
 							<th>Day</th>
@@ -37,19 +37,19 @@
 					<tbody>
 						<tr>
 							<td>
-								<select>
+								<select id="daypicker">
 									<option value="0">Sunday</option>
-									<option value="0">Monday</option>
-									<option value="0">Tuesday</option>
-									<option value="0">Wednesday</option>
-									<option value="0">Thursday</option>
-									<option value="0">Friday</option>
-									<option value="0">Saturday</option>
+									<option value="1">Monday</option>
+									<option value="2">Tuesday</option>
+									<option value="3">Wednesday</option>
+									<option value="4">Thursday</option>
+									<option value="5">Friday</option>
+									<option value="6">Saturday</option>
 								</select>
-							<td> <input id="daytimepicker" type="text" class="time" size=6/>  
+							<td> <input id="timepicker" type="text" class="time" size=6/>  
 								<script> 
 									$(function() { 
-										$('#daytimepicker').timepicker({ 'step': 15 }); 
+										$('#timepicker').timepicker({ 'step': 15 }); 
 									}); 
 								</script>
 							</td>
@@ -75,13 +75,41 @@
 			$("body").on("click", ".insert", function () {
 				InsertRowBelow(this);
 			});
-
+			
+			// Fires any time a daypicker changes.
+			$("body").on('change', '#daypicker', function() {	
+				sortTable();
+			});
+			
+			// Fires any time a timepicker changes.
+			$("body").on('change', '#timepicker', function() {	
+				sortTable();
+			});
+			
 			// html table odd even row color
 			function SetColor() {
 				$("tr:odd").css("background-color", "#eee");
 				$("tr:even").css("background-color", "#ddd");
 			}
 
+			function sortTable(){
+				var tbl = document.getElementById("scheduleTable").tBodies[0];
+				var store = [];
+				for(var i=0, len=tbl.rows.length; i<len; i++){
+					var row = tbl.rows[i];
+					var sortnr = $($(row.cells[1]).children()[0]).timepicker('getSecondsFromMidnight') + 1000000*parseInt($($(row.cells[0]).children()[0]).val());
+					console.log('sort: '+sortnr);
+					if(!isNaN(sortnr)) store.push([sortnr, row]);
+				}
+				store.sort(function(x,y){
+					return x[0] - y[0];
+				});
+				for(var i=0, len=store.length; i<len; i++){
+					tbl.appendChild(store[i][1]);
+				}
+				store = null;
+			}
+			
 			// Dynamically add and delete html table row on user click 
 			function RemoveTableRow(element) {
 				var rowCount = $('tr').length;
@@ -92,19 +120,19 @@
 				}
 				return false;
 			}
-
+			
 			// How to insert row at end of table
 			function AddRowBottom() {
 				var newRow = $('table tbody tr:last').clone();
 				$('table').append(newRow);
-				newRow.find('#daytimepicker').timepicker({ 'step': 15 }); 
+				newRow.find('#timepicker').timepicker({ 'step': 15 }); 
 				SetColor();
 			}
 
 			// Insert a row below the clicked element
 			function InsertRowBelow(element) {
 				var newRow = $(element).closest("tr").clone();
-				newRow.find('#daytimepicker').timepicker({ 'step': 15 });
+				newRow.find('#timepicker').timepicker({ 'step': 15 });
 				$(element).closest("tr").after(newRow);
 				SetColor();
 			}
@@ -113,7 +141,7 @@
 			function AddRowTop() {
 				var newRow = $('table tbody tr:last').clone();
 				$('table').prepend(newRow);
-				newRow.find('#daytimepicker').timepicker({ 'step': 15 }); 
+				newRow.find('#timepicker').timepicker({ 'step': 15 }); 
 				SetColor();
 			}
 		</script>
