@@ -22,44 +22,47 @@
 		
 		<div>
 			<div id="explainContainer"> <b>System Schedule</b>
-				<table id="scheduleTable" border="0">
-					<thead>
-						<tr>
-							<th>Day</th>
-							<th>Time</th>
-							<th>Low Temp</th>
-							<th>High Temp</th>
-							<th><a href="javascript:void(0)" onclick="AddRowTop()">Insert Top</a>
+				<form action="schedule_submit" method="POST" id="sched">
+					<table id="scheduleTable" border="0">
+						<thead>
+							<tr>
+								<th>Day</th>
+								<th>Time</th>
+								<th>Low Temp</th>
+								<th>High Temp</th>
+								<th><a href="javascript:void(0)" onclick="AddRowTop()">Insert Top</a>
 
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>
-								<select id="daypicker" class="daypicker">
-									<option value="0">Sunday</option>
-									<option value="1">Monday</option>
-									<option value="2">Tuesday</option>
-									<option value="3">Wednesday</option>
-									<option value="4">Thursday</option>
-									<option value="5">Friday</option>
-									<option value="6">Saturday</option>
-								</select>
-							<td> <input id="timepicker" type="text" class="time" size=6/>  
-								<script> 
-									$(function() { 
-										$('#timepicker').timepicker({ 'step': 15 }); 
-									}); 
-								</script>
-							</td>
-							<td> <input type="text" id="lowTempBox" name="lowTempBox" class="lowTempBox" size=1 />  </td>
-							<td> <input type="text" id="highTempBox" name="highTempBox" class="highTempBox" size=1 />  </td>
-							<td> <a href="#" class="insert">Insert Below</a> </td>
-							<td> <a href="#" class="remove">Remove</a> </td>
-						</tr>
-					</tbody>
-				</table>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<select id="daypicker" class="daypicker">
+										<option value="0">Sunday</option>
+										<option value="1">Monday</option>
+										<option value="2">Tuesday</option>
+										<option value="3">Wednesday</option>
+										<option value="4">Thursday</option>
+										<option value="5">Friday</option>
+										<option value="6">Saturday</option>
+									</select>
+								<td> <input id="timepicker" type="text" class="time" size=6/>  
+									<script> 
+										$(function() { 
+											$('#timepicker').timepicker({ 'step': 15 }); 
+										}); 
+									</script>
+								</td>
+								<td> <input type="text" id="lowTempBox" name="lowTempBox" class="lowTempBox" size=1 />  </td>
+								<td> <input type="text" id="highTempBox" name="highTempBox" class="highTempBox" size=1 />  </td>
+								<td> <a href="#" class="insert">Insert Below</a> </td>
+								<td> <a href="#" class="remove">Remove</a> </td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+				<button type="submit" form="sched" 	value="Save">Save</button>
 			</div>
 		</div>
 		
