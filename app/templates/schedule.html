@@ -37,7 +37,7 @@
 					<tbody>
 						<tr>
 							<td>
-								<select id="daypicker">
+								<select id="daypicker" class="daypicker">
 									<option value="0">Sunday</option>
 									<option value="1">Monday</option>
 									<option value="2">Tuesday</option>
@@ -53,8 +53,8 @@
 									}); 
 								</script>
 							</td>
-							<td> <input type="text" size=1 />  </td>
-							<td> <input type="text" size=1 />  </td>
+							<td> <input type="text" id="lowTempBox" name="lowTempBox" class="lowTempBox" size=1 />  </td>
+							<td> <input type="text" id="highTempBox" name="highTempBox" class="highTempBox" size=1 />  </td>
 							<td> <a href="#" class="insert">Insert Below</a> </td>
 							<td> <a href="#" class="remove">Remove</a> </td>
 						</tr>
@@ -66,6 +66,8 @@
 		<script type=text/javascript>
 			SetColor(); //set the table colors (alternating white/grey rows)
 
+			var cloneId = 0;
+			
 			// Remove table row after clicking table row delete button
 			$("body").on("click", ".remove", function () {
 				RemoveTableRow(this);
@@ -77,12 +79,12 @@
 			});
 			
 			// Fires any time a daypicker changes.
-			$("body").on('change', '#daypicker', function() {	
+			$("body").on('change', '.daypicker', function() {	
 				sortTable();
 			});
 			
 			// Fires any time a timepicker changes.
-			$("body").on('change', '#timepicker', function() {	
+			$("body").on('change', '.timepicker', function() {	
 				sortTable();
 			});
 			
@@ -97,7 +99,7 @@
 				var store = [];
 				for(var i=0, len=tbl.rows.length; i<len; i++){
 					var row = tbl.rows[i];
-					var sortnr = $($(row.cells[1]).children()[0]).timepicker('getSecondsFromMidnight') + 1000000*parseInt($($(row.cells[0]).children()[0]).val());
+					var sortnr = $($(row.cells[1]).children()[0]).timepicker('getSecondsFromMidnight') + 3600*24*parseInt($($(row.cells[0]).children()[0]).val());
 					if(!isNaN(sortnr)) store.push([sortnr, row]);
 				}
 				store.sort(function(x,y){
@@ -120,19 +122,33 @@
 				}
 				return false;
 			}
-			
+
 			// How to insert row at end of table
 			function AddRowBottom() {
 				var newRow = $('table tbody tr:last').clone();
+				cloneId++;
+				newRow.find('.daypicker').attr('id', 'daypicker'+cloneId).attr('name','daypicker'+cloneId);
+				newRow.find('.time').attr('id', 'timepicker'+cloneId).attr('name','timepicker'+cloneId);
+				newRow.find('.lowTempBox').attr('id', 'lowTempBox'+cloneId).attr('name','lowTempBox'+cloneId);
+				newRow.find('.highTempBox').attr('id', 'highTempBox'+cloneId).attr('name','highTempBox'+cloneId);
+				
+				newRow.find('.time').timepicker({ 'step': 15 }); 
+				
 				$('table').append(newRow);
-				newRow.find('#timepicker').timepicker({ 'step': 15 }); 
 				SetColor();
 			}
 
 			// Insert a row below the clicked element
 			function InsertRowBelow(element) {
 				var newRow = $(element).closest("tr").clone();
-				newRow.find('#timepicker').timepicker({ 'step': 15 });
+				cloneId++;
+				newRow.find('.daypicker').attr('id', 'daypicker'+cloneId).attr('name','daypicker'+cloneId);
+				newRow.find('.time').attr('id', 'timepicker'+cloneId).attr('name','timepicker'+cloneId);
+				newRow.find('.lowTempBox').attr('id', 'lowTempBox'+cloneId).attr('name','lowTempBox'+cloneId);
+				newRow.find('.highTempBox').attr('id', 'highTempBox'+cloneId).attr('name','highTempBox'+cloneId);
+				
+				newRow.find('.time').timepicker({ 'step': 15 });
+				
 				$(element).closest("tr").after(newRow);
 				SetColor();
 			}
@@ -140,8 +156,15 @@
 			// How to insert row at top of table
 			function AddRowTop() {
 				var newRow = $('table tbody tr:last').clone();
+				cloneId++;
+				newRow.find('.daypicker').attr('id', 'daypicker'+cloneId).attr('name','daypicker'+cloneId);
+				newRow.find('.time').attr('id', 'timepicker'+cloneId).attr('name','timepicker'+cloneId);
+				newRow.find('.lowTempBox').attr('id', 'lowTempBox'+cloneId).attr('name','lowTempBox'+cloneId);
+				newRow.find('.highTempBox').attr('id', 'highTempBox'+cloneId).attr('name','highTempBox'+cloneId);
+				
+				newRow.find('.time').timepicker({ 'step': 15 }); 
+				
 				$('table').prepend(newRow);
-				newRow.find('#timepicker').timepicker({ 'step': 15 }); 
 				SetColor();
 			}
 		</script>
