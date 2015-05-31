@@ -20,12 +20,6 @@ T_COOL_HYST_C     = 0.5
 #AC will turn off when temp climbs above setpoint + T_HEAT_THRESH_C
 T_HEAT_HYST_C     = 0.05
 
-#Mode will switch from heat to cool if temperature goes above this
-T_COOL_MODE_C       = fToC(78)
-
-#Mode will switch from cool to heat if temperature goes below this
-T_HEAT_MODE_C       = fToC(70)
-
 #---- State Transition Stuff ---
 
 # enum describing thermostat state
@@ -59,7 +53,7 @@ thermoStateStr = {
 # they should go in these functions.  Otherwise let the config test in nextState() take
 # care of things.
 
-def tSInit(tInt, tExt, tSet):
+def tSInit(tInt, tExt, tSet, minSetpt, maxSetpt):
     #TODO consider weather forecast in initialization
     
     #For now, if it's colder outside than inside, go into heat mode.  
@@ -70,9 +64,9 @@ def tSInit(tInt, tExt, tSet):
         print "syscontrol: Starting in OFF-C"
         return thermoState.COOL_OFF
         
-def tSCoolOff(tInt, tExt, tSet):
+def tSCoolOff(tInt, tExt, tSet, minSetpt, maxSetpt):
     #First check if we should even be in heating mode
-    if tInt < T_HEAT_MODE_C:
+    if tInt < minSetpt:
         LIRCCmd.toggleOnOff()
         return thermoState.HEAT_OFF
     
@@ -87,7 +81,7 @@ def tSCoolOff(tInt, tExt, tSet):
         
     return thermoState.COOL_OFF
     
-def tSCoolExt(tInt, tExt, tSet):
+def tSCoolExt(tInt, tExt, tSet, minSetpt, maxSetpt):
     if tExt <= tSet and tInt > tSet:
         return thermoState.COOL_EXT
 
@@ -95,15 +89,15 @@ def tSCoolExt(tInt, tExt, tSet):
     LIRCCmd.toggleOnOff()
     return thermoState.COOL_OFF
     
-def tSCoolLow(tInt, tExt, tSet):
+def tSCoolLow(tInt, tExt, tSet, minSetpt, maxSetpt):
     #TODO figure out if fan speed control helps AC.  Until then use high only
     return thermoState.COOL_HIGH
     
-def tSCoolMed(tInt, tExt, tSet):
+def tSCoolMed(tInt, tExt, tSet, minSetpt, maxSetpt):
     #TODO figure out if fan speed control helps AC.  Until then use high only
     return thermoState.COOL_HIGH
     
-def tSCoolHigh(tInt, tExt, tSet):
+def tSCoolHigh(tInt, tExt, tSet, minSetpt, maxSetpt):
     #check if done cooling the place off (has hysteresis to allow for air mixing)
     if tInt <= tSet - T_COOL_HYST_C:
         return thermoState.COOL_OFF
@@ -115,9 +109,9 @@ def tSCoolHigh(tInt, tExt, tSet):
      
     return thermoState.COOL_HIGH
     
-def tSHeatOff(tInt, tExt, tSet):
+def tSHeatOff(tInt, tExt, tSet, minSetpt, maxSetpt):
     #First check if we should even be in heating mode
-    if tInt > T_COOL_MODE_C:
+    if tInt > maxSetpt:
         LIRCCmd.toggleOnOff()
         return thermoState.COOL_OFF
     
@@ -129,13 +123,13 @@ def tSHeatOff(tInt, tExt, tSet):
         
     return thermoState.HEAT_OFF
     
-def tSHeatExt(tInt, tExt, tSet):
+def tSHeatExt(tInt, tExt, tSet, minSetpt, maxSetpt):
     if tExt >= tSet and tInt < tSet:
         return thermoState.HEAT_EXT
     
     return thermoState.HEAT_OFF
     
-def tSHeatOn(tInt, tExt, tSet):
+def tSHeatOn(tInt, tExt, tSet, minSetpt, maxSetpt):
     #check if done heating the place (has hysteresis to allow for air mixing)
     if tInt >= tSet + T_HEAT_HYST_C:
         return thermoState.HEAT_OFF
@@ -216,10 +210,10 @@ thermoStateCfgFcn = {
     thermoState.HEAT_ON     : cfgHeatOn
 }
 
-def nextState(tInt, tExt, tSet):
+def nextState(tInt, tExt, tSet, minSetpt, maxSetpt):
     """Computes next state given current state and temps"""
     global state
-    nextState = thermoStateTrFcn[state](tInt, tExt, tSet)
+    nextState = thermoStateTrFcn[state](tInt, tExt, tSet, minSetpt, maxSetpt)
     if nextState != state:
         #configure system for new state.
         thermoStateCfgFcn[nextState]()
