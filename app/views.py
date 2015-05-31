@@ -173,8 +173,24 @@ def scheduleSubmit():
         if not (('timepicker' in entries[n]) and ('daypicker' in entries[n]) and ('highTempBox' in entries[n]) and ('lowTempBox' in entries[n])):
             return u'Error: Set ' + str(n) + u'does not contain all required entries', 400
             
-    # ...then replace the database table with these values.  (TODO)
-    return u'OK'
+        if entries[n]['lowTempBox'] > entries[n]['highTempBox']:
+            return u'Error: Set ' + str(n) + u' low setpoint greater than high setpoint', 400
+            
+    try:
+        # ...nuke the existing schedule table...
+        nRowsDeleted = db.session.query(Models.Schedule).delete()
+        
+        # ...then add things back appropriately.
+        for n in entries:
+            scheduleRow = models.Schedule(day = entries[n]['dayPicker'], time = entries[n]['timepicker'], lowSetpoint = entries[n][lowTempBox], highSetpoint = entries[n][highTempBox])
+            db.session.add(scheduleRow)
+        
+        # then make all changes at once.  
+        db.session.commit()
+        return u'Schedule Updated'
+    except:
+        db.session.rollback()
+        return u'Schedule Update Failed', 500
     
 @app.route(u'/')
 @app.route(u'/index')
