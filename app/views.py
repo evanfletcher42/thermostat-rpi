@@ -168,25 +168,13 @@ def scheduleSubmit():
         except AttributeError:
             return u'Error: String ' + key + u' does not contain a number'
 
-    # Now that everything is organized, we first validate that we have all the information we need...
-    # Dev/TMPD: spit back a nicely formatted string of all the events as described.
-    
-    daysOfWeek = {
-    0    : u"Sunday",
-    1    : u"Monday",
-    2    : u"Tuesday",
-    3    : u"Wednesday",
-    4    : u"Thursday",
-    5    : u"Friday",
-    6    : u"Saturday"
-}
-    
-    result = ""
+    # Now that everything is organized, we first verify that we have all the information we need...
     for n in entries:
-        result = result + daysOfWeek[entries[n]['daypicker']] + " " + str(entries[n]['timepicker']) + " - " + str(entries[n]['lowTempBox']) + " " + str(entries[n]['highTempBox']) + "\n"
-        
+        if not (('timepicker' in entries[n]) and ('daypicker' in entries[n]) and ('highTempBox' in entries[n]) and ('lowTempBox' in entries[n])):
+            return u'Error: Set ' + str(n) + u'does not contain all required entries'
+            
     # ...then replace the database table with these values.  (TODO)
-    return result
+    return u'OK'
     
 @app.route(u'/')
 @app.route(u'/index')
