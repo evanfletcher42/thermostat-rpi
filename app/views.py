@@ -141,7 +141,7 @@ def scheduleSubmit():
                 if success:
                     eventTime = datetime.fromtimestamp(time.mktime(dtstruct)).time()
                 else:
-                    return u'Error: Failed to parse ' + key + u' value ' + request.form[key] + u'as time'
+                    return u'Error: Failed to parse ' + key + u' value ' + request.form[key] + u'as time', 400
                 
                 entries[N][attr]=eventTime
                 
@@ -149,7 +149,7 @@ def scheduleSubmit():
                 try:
                     dayInt = int(request.form[key])
                 except ValueError:
-                    return u'Error: Could not parse ' + key + u' value '+request.form[key] + u' as integer'
+                    return u'Error: Could not parse ' + key + u' value '+request.form[key] + u' as integer', 400
                     
                 entries[N][attr]=dayInt
           
@@ -157,21 +157,21 @@ def scheduleSubmit():
                 try:
                     tVal = float(request.form[key])
                 except ValueError:
-                    return u'Error: Could not parse ' + key + u' value '+request.form[key] + u' as float'
+                    return u'Error: Could not parse ' + key + u' value '+request.form[key] + u' as float', 400
                     
                 entries[N][attr]=tVal
             else:
-                return u'Error: Attribute ' + attr + u' is unexpected'
+                return u'Error: Attribute ' + attr + u' is unexpected', 400
                 
         except ValueError:
-            return u'Error: Could not parse string ' + Nstr + u' in key ' + key + u' as integer'
+            return u'Error: Could not parse string ' + Nstr + u' in key ' + key + u' as integer', 400
         except AttributeError:
-            return u'Error: String ' + key + u' does not contain a number'
+            return u'Error: String ' + key + u' does not contain a number', 400
 
     # Now that everything is organized, we first verify that we have all the information we need...
     for n in entries:
         if not (('timepicker' in entries[n]) and ('daypicker' in entries[n]) and ('highTempBox' in entries[n]) and ('lowTempBox' in entries[n])):
-            return u'Error: Set ' + str(n) + u'does not contain all required entries'
+            return u'Error: Set ' + str(n) + u'does not contain all required entries', 400
             
     # ...then replace the database table with these values.  (TODO)
     return u'OK'
