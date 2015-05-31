@@ -68,7 +68,33 @@
 		</div>
 		
 		<script type=text/javascript>
-			SetColor(); //set the table colors (alternating white/grey rows)
+			// fill the table with values from DB on page load.
+			$.getJSON( 
+					'/getSchedule',	
+					{},
+					function(data)
+					{
+						$.each(data, function(index, element) {
+							var targetRow; // row to write current data into
+							if(index == 1)
+							{
+								//Table starts with 1 row as defined by HTML.  Use it for first data point.
+								targetRow = $('table tbody tr:last');
+							} else
+							{
+								//Subsequent data should clone a row from the bottom and use it.
+								targetRow = AddRowBottom();
+							}
+							
+							targetRow.find('.daypicker').val(element.day);
+							targetRow.find('.time').timepicker('setTime', new Date(1970, 1, 1, element.tHour, element.tMinute, 0,0));
+							targetRow.find('.lowTempBox').val(element.low);
+							targetRow.find('.highTempBox').val(element.high);
+						});
+						sortTable();
+					});
+			
+			sortTable(); //Sort the table (data comes unordered) and set the table colors (alternating white/grey rows)
 
 			var cloneId = 0;
 			
@@ -140,6 +166,7 @@
 				
 				$('table').append(newRow);
 				SetColor();
+				return newRow;
 			}
 
 			// Insert a row below the clicked element
