@@ -6,6 +6,9 @@ from sqlalchemy import func, orm
 from sqlalchemy.orm import load_only
 import LIRCCmd
 from datetime import datetime, timedelta
+import time
+import parsedatetime as pdt
+import re
 
 thermoStateStr = {
     0    : u"INIT",
@@ -97,12 +100,93 @@ def schedule():
     
 @app.route(u'/scheduleSubmit', methods=['POST'])
 def scheduleSubmit():
-    dataRecv = ""
-    # loop through keys
+    # When we receive schedule data from a POST, it contains information like this:
+    #
+    # timepickerN	xx:XX(am/pm)
+    # daypickerN	D
+    # highTempBoxN	A
+    # lowTempBoxN	B
+    #
+    # where:
+    # N is an integer >= 0 acting as a unique identifier for a schedule row in this POST
+    # D is an integer 0 <= D <= 6 representing the day of week Sunday...Saturday
+    # xx:XX(am/pm) is a human-readable time in that format
+    # A and B are floating point numbers representing minimum and maximum temperature setpoint in Deg. C
+    #
+    # These groups of 4 bits of data may not arrive in order, and may be mixed up with other sets.
+    # Additionally, numbers N in the set are only guaranteed to be unique - not guaranteed to be consecutive.
+    #
+    # This method must parse this POST data, organize it into schedule information, and use it to replace the 
+    # Schedule table in the database.  The controller will read this database and use it for setpoints.  
+    
+    # Loop through all the keys in the POST and organize it into a nested dict[N][attribute] = value
+    entries = {}
+    
+    cal = pdt.Calendar()
+    
+    # loop through keys in POST, format them into nested dict
     for key in request.form:
-        dataRecv = dataRecv + key + "\t" + request.form[key] + "\n"
+        # key is a word ending in a number. We need to separate them.
+        try:
+            Nstr = re.search('(\d+)$', key).group(0)
+            N = int(Nstr)
+            attr = key[:(-1*len(Nstr))]
+            
+            # make a new nested dict if this is the first time we've seen this key
+            if not (N in entries):
+                entries[N]={}
+                
+            if attr == 'timepicker':
+                (dtstruct, success) = cal.parse(request.form[key])
+                if success:
+                    eventTime = datetime.fromtimestamp(time.mktime(dtstruct)).time()
+                else:
+                    return u'Error: Failed to parse ' + key + u' value ' + request.form[key] + u'as time'
+                
+                entries[N][attr]=eventTime
+                
+            elif attr == 'daypicker':
+                try:
+                    dayInt = int(request.form[key])
+                except ValueError:
+                    return u'Error: Could not parse ' + key + u' value '+request.form[key] + u' as integer'
+                    
+                entries[N][attr]=dayInt
+          
+            elif attr == 'highTempBox' or attr == 'lowTempBox':
+                try:
+                    tVal = float(request.form[key])
+                except ValueError:
+                    return u'Error: Could not parse ' + key + u' value '+request.form[key] + u' as float'
+                    
+                entries[N][attr]=tVal
+            else:
+                return u'Error: Attribute ' + attr + u' is unexpected'
+                
+        except ValueError:
+            return u'Error: Could not parse string ' + Nstr + u' in key ' + key + u' as integer'
+        except AttributeError:
+            return u'Error: String ' + key + u' does not contain a number'
+
+    # Now that everything is organized, we first validate that we have all the information we need...
+    # Dev/TMPD: spit back a nicely formatted string of all the events as described.
+    
+    daysOfWeek = {
+    0    : u"Sunday",
+    1    : u"Monday",
+    2    : u"Tuesday",
+    3    : u"Wednesday",
+    4    : u"Thursday",
+    5    : u"Friday",
+    6    : u"Saturday"
+}
+    
+    result = ""
+    for n in entries:
+        result = result + daysOfWeek[entries[n]['daypicker']] + " " + str(entries[n]['timepicker']) + " - " + str(entries[n]['lowTempBox']) + " " + str(entries[n]['highTempBox']) + "\n"
         
-    return dataRecv
+    # ...then replace the database table with these values.  (TODO)
+    return result
     
 @app.route(u'/')
 @app.route(u'/index')
