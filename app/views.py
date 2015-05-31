@@ -98,6 +98,23 @@ def schedule():
     title = u'Thermostat v0.1'
     return render_template(u"schedule.html", title=title)
     
+@app.route(u'/getSchedule')
+def getSchedule():
+    # Pulls and displays the existing schedule in the database.
+    
+    sched = db.session.query(models.Schedule).all()
+    
+    sendJson = {}
+    for x in sched:
+        sendJson[x.id] = {}
+        sendJson[x.id]['day']  = x.day
+        sendJson[x.id]['tHour'] = x.time.hour
+        sendJson[x.id]['tMinute'] = x.time.minute
+        sendJson[x.id]['low']  = x.lowSetpoint
+        sendJson[x.id]['high'] = x.highSetpoint
+        
+    return jsonify(sendJson);
+    
 @app.route(u'/scheduleSubmit', methods=['POST'])
 def scheduleSubmit():
     # When we receive schedule data from a POST, it contains information like this:
