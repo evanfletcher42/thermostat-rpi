@@ -63,6 +63,7 @@
 					</table>
 				</form>
 				<button type="submit" form="schedForm" 	value="Save">Save Schedule</button>
+				<div id="submitResult"></div>
 			</div>
 		</div>
 		
@@ -175,7 +176,14 @@
 			$( "form" ).on( "submit", function( event ) {
 				event.preventDefault();
 				var submitStr = $( this ).serialize()
-				$.post('scheduleSubmit', submitStr)
+				$("#submitResult").text("Saving...");
+				$.post('scheduleSubmit', submitStr, function(data)
+				{
+					$("#submitResult").text(data);
+				}).error(function(data)
+				{
+					$("#submitResult").text("Error saving schedule");
+				});
 			});
 		</script>
 	</body>
