@@ -38,7 +38,7 @@
 						<tbody>
 							<tr>
 								<td>
-									<select id="daypicker" class="daypicker">
+									<select id="daypicker" class="daypicker" name="daypicker0">
 										<option value="0">Sunday</option>
 										<option value="1">Monday</option>
 										<option value="2">Tuesday</option>
@@ -47,15 +47,15 @@
 										<option value="5">Friday</option>
 										<option value="6">Saturday</option>
 									</select>
-								<td> <input id="timepicker" type="text" class="time" size=6/>  
+								<td> <input id="timepicker" type="text" class="time" name="timepicker0" size=6/>  
 									<script> 
 										$(function() { 
 											$('#timepicker').timepicker({ 'step': 15 }); 
 										}); 
 									</script>
 								</td>
-								<td> <input type="text" id="lowTempBox" name="lowTempBox" class="lowTempBox" size=1 />  </td>
-								<td> <input type="text" id="highTempBox" name="highTempBox" class="highTempBox" size=1 />  </td>
+								<td> <input type="text" id="lowTempBox" name="lowTempBox" class="lowTempBox0" size=1 />  </td>
+								<td> <input type="text" id="highTempBox" name="highTempBox" class="highTempBox0" size=1 />  </td>
 								<td> <a href="#" class="insert">Insert Below</a> </td>
 								<td> <a href="#" class="remove">Remove</a> </td>
 							</tr>
