@@ -22,7 +22,7 @@
 		
 		<div>
 			<div id="explainContainer"> <b>System Schedule</b>
-				<form action="schedule_submit" method="POST" id="sched">
+				<form id="schedForm"> 
 					<table id="scheduleTable" border="0">
 						<thead>
 							<tr>
@@ -62,7 +62,7 @@
 						</tbody>
 					</table>
 				</form>
-				<button type="submit" form="sched" 	value="Save">Save</button>
+				<button type="submit" form="schedForm" 	value="Save">Save Schedule</button>
 			</div>
 		</div>
 		
@@ -170,6 +170,12 @@
 				$('table').prepend(newRow);
 				SetColor();
 			}
+			
+			// AJAX form submission
+			$( "form" ).on( "submit", function( event ) {
+				event.preventDefault();
+				console.log( $( this ).serialize() );
+			});
 		</script>
 	</body>
 </html>
