@@ -28,8 +28,8 @@
 							<tr>
 								<th>Day</th>
 								<th>Time</th>
-								<th>Low Temp</th>
-								<th>High Temp</th>
+								<th>Low Temp (F)</th>
+								<th>High Temp (F)</th>
 								<th><a href="javascript:void(0)" onclick="AddRowTop()">Insert Top</a>
 
 								</th>
@@ -88,8 +88,8 @@
 							
 							targetRow.find('.daypicker').val(element.day);
 							targetRow.find('.time').timepicker('setTime', new Date(1970, 1, 1, element.tHour, element.tMinute, 0,0));
-							targetRow.find('.lowTempBox').val(element.low);
-							targetRow.find('.highTempBox').val(element.high);
+							targetRow.find('.lowTempBox').val(element.low * 9/5 + 32);
+							targetRow.find('.highTempBox').val(element.high * 9/5 + 32);
 						});
 						sortTable();
 					});
@@ -202,7 +202,24 @@
 			// AJAX form submission
 			$( "form" ).on( "submit", function( event ) {
 				event.preventDefault();
+				
+				//temporarily convert everything on the page into C (because that's what the controller/DB lives in)
+				$( this ).find('.lowTempBox').each(function() {
+					this.value = (this.value-32)*5/9;
+				});
+				$( this ).find('.highTempBox').each(function() {
+					this.value = (this.value-32)*5/9;
+				});
 				var submitStr = $( this ).serialize()
+				
+				//now put it back
+				$( this ).find('.lowTempBox').each(function() {
+					this.value = this.value*9/5+32;
+				});
+				$( this ).find('.highTempBox').each(function() {
+					this.value = this.value*9/5+32;
+				});
+				
 				$("#submitResult").text("Saving...");
 				$.post('scheduleSubmit', submitStr, function(data)
 				{
