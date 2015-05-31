@@ -174,7 +174,8 @@
 			// AJAX form submission
 			$( "form" ).on( "submit", function( event ) {
 				event.preventDefault();
-				console.log( $( this ).serialize() );
+				var submitStr = $( this ).serialize()
+				$.post('scheduleSubmit', submitStr)
 			});
 		</script>
 	</body>

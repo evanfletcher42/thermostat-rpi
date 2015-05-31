@@ -95,6 +95,15 @@ def schedule():
     title = u'Thermostat v0.1'
     return render_template(u"schedule.html", title=title)
     
+@app.route(u'/scheduleSubmit', methods=['POST'])
+def scheduleSubmit():
+    dataRecv = ""
+    # loop through keys
+    for key in request.form:
+        dataRecv = dataRecv + key + "\t" + request.form[key] + "\n"
+        
+    return dataRecv
+    
 @app.route(u'/')
 @app.route(u'/index')
 
