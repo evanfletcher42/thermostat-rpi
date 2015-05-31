@@ -176,9 +176,9 @@ def scheduleSubmit():
         if entries[n]['lowTempBox'] > entries[n]['highTempBox']:
             return u'Error: Set ' + str(n) + u' low setpoint greater than high setpoint', 400
             
-    #try:
+    try:
         # ...nuke the existing schedule table...
-        nRowsDeleted = db.session.query(Models.Schedule).delete()
+        nRowsDeleted = db.session.query(models.Schedule).delete()
         
         # ...then add things back appropriately.
         for n in entries:
@@ -188,9 +188,9 @@ def scheduleSubmit():
         # then make all changes at once.  
         db.session.commit()
         return u'Schedule Updated'
-    #except:
-        #db.session.rollback()
-        #return u'Schedule Update Failed: '+ type(e) , 500
+    except:
+        db.session.rollback()
+        return u'Schedule Update Failed', 500
     
 @app.route(u'/')
 @app.route(u'/index')
