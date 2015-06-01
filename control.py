@@ -9,6 +9,7 @@ from app import db, models
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import and_, or_
 
 #The calculated setpoint will be between these two numbers
 T_MAX_SETPOINT_C     = syscontrol.fToC(77)
@@ -73,26 +74,27 @@ while True:
     #query the database in order to get the most recent setpoint in the schedule.
     minSetpt = T_MIN_SETPOINT_C
     maxSetpt = T_MAX_SETPOINT_C
-    try:
-        result = db.session.query(models.Schedule)\
-        .order_by(models.Schedule.day.desc(), models.Schedule.time.desc())\
-        .filter(models.Schedule.time <= time_now, models.Schedule.day <= dayOfWeekNow)\
-        .first()
-        
+    
+    result = db.session.query(models.Schedule)\
+    .order_by(models.Schedule.day.desc(), models.Schedule.time.desc())\
+    .filter(or_(models.Schedule.day < dayOfWeekNow, and_(models.Schedule.day == dayOfWeekNow, models.Schedule.time <= time_now)))\
+    .first()
+    
+    if result is not None:
         minSetpt = result.lowSetpoint
         maxSetpt = result.highSetpoint
-    except NoResultFound:
+    else:
         #If we get nothing, it means we've wrapped around Sunday 00:00 and need to use the "last" one.
         #If this dies too, that means the DB is empty, in which case we fall back on defaults.
-        try:
-            result = db.session.query(models.Schedule)\
-            .order_by(models.Schedule.day.desc(), models.Schedule.time.desc())\
-            .first()
-            
+        result = db.session.query(models.Schedule)\
+        .order_by(models.Schedule.day.desc(), models.Schedule.time.desc())\
+        .first()
+        
+        if result is not None:
             minSetpt = result.lowSetpoint
             maxSetpt = result.highSetpoint
-        except NoResultFound:
-            print "Warning: DB seems empty.  Using default min/max setpoint"
+        else:
+            print "Warning: DB seems empty.  Using default min/max setpoint."
     
     #print 'meas time: \t', str(dt_meas)
     #print 'int temp:  \t', temp[1]
