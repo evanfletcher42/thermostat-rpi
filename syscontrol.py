@@ -14,7 +14,7 @@ def fToC(tempF): #function that converts Fahrenheit to Celsius
 
 #If AC mode and temp > setpoint, AC will turn on.
 #AC will turn off when temp drops below setpoint - T_COOL_THRESH_C
-T_COOL_HYST_C     = 0.5
+T_COOL_HYST_C     = 0.125
 
 #If HEAT mode and temp < setpoint, HEAT will turn on.
 #AC will turn off when temp climbs above setpoint + T_HEAT_THRESH_C
@@ -57,6 +57,7 @@ def tSInit(tInt, tExt, tSet, minSetpt, maxSetpt):
     #TODO consider weather forecast in initialization
     
     #For now, if it's colder outside than inside, go into heat mode.  
+    #TODO: Initialize to last state in DB, or if DB empty, use this
     if tExt < tInt:
         print "syscontrol: Starting in OFF-H"
         return thermoState.HEAT_OFF
@@ -65,15 +66,16 @@ def tSInit(tInt, tExt, tSet, minSetpt, maxSetpt):
         return thermoState.COOL_OFF
         
 def tSCoolOff(tInt, tExt, tSet, minSetpt, maxSetpt):
-    #First check if we should even be in heating mode
+    #First check if we should switch to heat mode
     if tInt < minSetpt:
+        # Turn off the fan - don't need that for the radiators to work
         LIRCCmd.toggleOnOff()
         return thermoState.HEAT_OFF
     
     #Do we need to modify the temperature?
     if tInt > tSet:
         if tExt <= tSet:
-            #just let the wind handle things - ac unit fan seems to have little effect
+            # Turn off the fan (observed to have little effect, even if window open)
             LIRCCmd.toggleOnOff()
             return thermoState.COOL_EXT
             
@@ -85,7 +87,7 @@ def tSCoolExt(tInt, tExt, tSet, minSetpt, maxSetpt):
     if tExt <= tSet and tInt > tSet:
         return thermoState.COOL_EXT
 
-    #turn AC unit back on first
+    # fan needs to be turned on before jumping to / configuring for COOL_OFF state
     LIRCCmd.toggleOnOff()
     return thermoState.COOL_OFF
     

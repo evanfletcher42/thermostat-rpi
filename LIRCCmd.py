@@ -1,6 +1,6 @@
 import os, time
 
-__CMD_RECV_DELAY = 0.2
+__CMD_RECV_DELAY = 0.3
 
 def toggleOnOff():
     os.system("irsend SEND_ONCE GE_AirConditioner on_stop")
