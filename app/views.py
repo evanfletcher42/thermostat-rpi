@@ -77,6 +77,7 @@ def get_history():
     opLogTimes = [unix_time(x.time) for x in opLog]
     opLogStates = [x.state for x in opLog]
     opLogTemps = [x.indoorTemp for x in opLog]
+    opLogSetTemps  = [x.setpointTemp for x in opLog]
     wDataTimes = [unix_time(x.time) for x in wData]
     wDataTemps = [x.extTemp for x in wData]
     
@@ -84,6 +85,7 @@ def get_history():
         u'opTimes'      : opLogTimes,
         u'opModes'      : opLogStates,
         u'indTemps'     : opLogTemps,
+        u'setTemps'     : opLogSetTemps,
         u'extTempTimes' : wDataTimes,
         u'extTemps'     : wDataTemps
     })
