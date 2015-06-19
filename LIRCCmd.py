@@ -1,29 +1,39 @@
 import os, time
 
-__CMD_RECV_DELAY = 0.3
+# Delay in seconds after sending a set of commands, before sending the next.
+__CMD_RECV_DELAY = 0.25
+
+# Number of times a command should be sent in quick succession prior to delay.  Increases odds of reception.
+# Does not apply to commands which have state (i.e on_stop)
+__N_SEND = 5;
 
 def toggleOnOff():
     os.system("irsend SEND_ONCE GE_AirConditioner on_stop")
     time.sleep(__CMD_RECV_DELAY)
     
 def setCoolMode():
-    os.system("irsend SEND_ONCE GE_AirConditioner cool")
+    for x in range(0, __N_SEND):
+        os.system("irsend SEND_ONCE GE_AirConditioner cool")
     time.sleep(__CMD_RECV_DELAY)
     
 def setFanMode():
-    os.system("irsend SEND_ONCE GE_AirConditioner fan")
+    for x in range(0, __N_SEND):
+        os.system("irsend SEND_ONCE GE_AirConditioner fan")
     time.sleep(__CMD_RECV_DELAY)
     
 def setFanHi():
-    os.system("irsend SEND_ONCE GE_AirConditioner hi")
+    for x in range(0, __N_SEND):
+        os.system("irsend SEND_ONCE GE_AirConditioner hi")
     time.sleep(__CMD_RECV_DELAY)
     
 def setFanMed():
-    os.system("irsend SEND_ONCE GE_AirConditioner mid")
+    for x in range(0, __N_SEND):
+        os.system("irsend SEND_ONCE GE_AirConditioner mid")
     time.sleep(__CMD_RECV_DELAY)
     
 def setFanLow():
-    os.system("irsend SEND_ONCE GE_AirConditioner low")
+    for x in range(0, __N_SEND):
+        os.system("irsend SEND_ONCE GE_AirConditioner low")
     time.sleep(__CMD_RECV_DELAY)
     
 def tempInc(n=1):
