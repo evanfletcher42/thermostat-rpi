@@ -63,7 +63,7 @@ def calcTmpTarget(objT, ambT):
     
 def reconnect(tag):
     print "Reconnecting to", tag, "..."
-	tool = sensorTagConns[tag]
+    tool = sensorTagConns[tag]
     tool.sendline('connect')
     tool.expect('Connection successful.*\[LE\]>')
     # Enable sensor and wait for a bit for it to turn on
