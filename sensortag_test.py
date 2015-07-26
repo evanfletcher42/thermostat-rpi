@@ -136,7 +136,7 @@ while True:
                 print tag, "\ttemp=", hSensorTemp*9/5+32, "\tRH=", hSensorRH
                 #record stuff in database
                 try:
-                    opLog = models.SensorTagData(macAddr = sensorTagConns[tag].replace(':',''), \
+                    opLog = models.SensorTagData(macAddr = sensorTagAddrs[tag].replace(':',''), \
                                                  time = sampleTime, \
                                                  temperature = hSensorTemp, \
                                                  relHumidity = hSensorRH)
@@ -163,6 +163,6 @@ while True:
     print
     
     # Wait
-    time.sleep(max(0,30-(time.time() - startTime)))
+    time.sleep(max(0,10-(time.time() - startTime)))
 
 
