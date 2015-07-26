@@ -81,8 +81,6 @@ def reconnect(tag):
     tool.expect('Connection successful.*\[LE\]>')
     
     # Enable sensors and wait for a bit for them to turn on
-    tool.sendline('char-write-cmd 0x29 01')
-    tool.expect('\[LE\]>') 
     tool.sendline('char-write-cmd 0x3F 01')
     tool.expect('\[LE\]>')  
     time.sleep(0.25)
@@ -110,10 +108,6 @@ while True:
     for tag in sensorTagConns:
         tool = sensorTagConns[tag]
         
-        # Enable temperature sensor and wait for a bit for it to turn on
-        tool.sendline('char-write-cmd 0x29 01')
-        tool.expect('\[LE\]>')  
-        
         # Enable humidity sensor and wait for a bit for it to turn on
         tool.sendline('char-write-cmd 0x3F 01')
         tool.expect('\[LE\]>')  
@@ -123,27 +117,6 @@ while True:
         tool = sensorTagConns[tag]
         retry = True
         while retry:        
-            # Take IR temp sensor reading
-            try:
-                tool.sendline('char-read-hnd 0x25')
-                i = tool.expect(['descriptor: .*', 'Disconnected'])
-            except:
-                reconnect(tag, tool)
-                continue
-            if i == 0:
-                rval = tool.after.split()
-                objT = floatfromhex(rval[2] + rval[1])
-                ambT = floatfromhex(rval[4] + rval[3])
-                #print rval
-                (calcAmbT, calcObjT) = calcTmpTarget(objT, ambT)
-                print tag, "\tamb=", calcAmbT*9/5+32, "\tIR=", calcObjT*9/5+32
-                if calcAmbT*9/5+32 < 60.0:
-                    coldReads = coldReads + 1
-            else:
-                reconnect(tool)
-                continue
-            retry = False;
-            
             # Take Humidity Sensor reading
             try:
                 tool.sendline('char-read-hnd 0x3B')
@@ -165,8 +138,6 @@ while True:
     for tag in sensorTagConns:
         tool = sensorTagConns[tag]
         # Disable sensor (save power)
-        tool.sendline('char-write-cmd 0x29 00')
-        tool.expect('\[LE\]>')
         tool.sendline('char-write-cmd 0x3F 00')
         tool.expect('\[LE\]>') 
         retry = False
@@ -174,7 +145,6 @@ while True:
     totalReadTime = totalReadTime + (time.time() - startTime)
     totalReads = totalReads + 1
     print "Last read: ", (time.time() - startTime), "s  Avg: ", (totalReadTime/totalReads), "s"
-    print "Cold Reads:", coldReads
     print
     
     # Wait
