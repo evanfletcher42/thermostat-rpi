@@ -31,9 +31,9 @@ def floatfromhex(h):
 # System will connect to and poll all of these.  
 
 sensorTagAddrs = {
-    "LivingRoom" :  "B4:99:4C:64:BA:B6"
-    #"Kitchen"    :  "B4:99:4C:64:AF:9F",
-    #"Bedroom"    :  "B4:99:4C:64:26:80"
+    "LivingRoom" :  "B4:99:4C:64:BA:B6",
+    "Kitchen"    :  "B4:99:4C:64:AF:9F",
+    "Bedroom"    :  "B4:99:4C:64:26:80"
 }
 
 # This algorithm borrowed from 
