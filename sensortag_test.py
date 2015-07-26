@@ -19,6 +19,9 @@
 import pexpect
 import sys
 import time
+from app import db, models
+from flask.ext.sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 def floatfromhex(h):
     t = float.fromhex(h)
@@ -120,6 +123,7 @@ while True:
             try:
                 tool.sendline('char-read-hnd 0x3B')
                 i = tool.expect(['descriptor: .*', 'Disconnected'])
+                sampleTime = datetime.now()
             except:
                 reconnect(tag, tool)
                 continue
@@ -130,6 +134,17 @@ while True:
                 #print rval
                 (hSensorTemp, hSensorRH) = calcHumTmpRel(rawT, rawH)
                 print tag, "\ttemp=", hSensorTemp*9/5+32, "\tRH=", hSensorRH
+                #record stuff in database
+                try:
+                    opLog = models.SensorTagData(macAddr = sensorTagConns[tag].replace(':',''), \
+                                                 time = sampleTime, \
+                                                 temperature = hSensorTemp, \
+                                                 relHumidity = hSensorRH)
+                    db.session.add(opLog)
+                    db.session.commit()
+                except:
+                    #fail gracefully (just don't log this time) if the DB is busy.
+                    db.session.rollback()
             else:
                 reconnect(tag, tool)
                 continue
@@ -147,6 +162,6 @@ while True:
     print
     
     # Wait
-    time.sleep(max(0,10-(time.time() - startTime)))
+    time.sleep(max(0,30-(time.time() - startTime)))
 
 
