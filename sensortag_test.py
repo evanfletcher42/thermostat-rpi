@@ -65,12 +65,17 @@ def calcTmpTarget(objT, ambT):
 def calcHumTmpRel(rawT, rawH):
     # these are hex strings representing unsigned 16 bit integers
     rawTInt = int(rawT,16)
+    
+    print "Raw humidity reading:", rawH
     rawHInt = int(rawH,16)
+    print "Translates to:", rawHInt
     
     temp = -46.85 + 175.72/65536 * float(rawTInt)
     
     rawHInt = rawHInt & ~(0x0003) # clear bits [1..0] (status bits)
+    print "With status bits cleared:", rawHInt
     rHumid = -6.0 + 125.0/65536 * float(rawHInt)
+    print "rHumid:", rHumid
     
     return (temp, rHumid) 
     
