@@ -74,9 +74,8 @@ def calcHumTmpRel(rawT, rawH):
     
     return (temp, rHumid) 
     
-def reconnect(tag):
+def reconnect(tag, tool):
     print "Reconnecting to", tag, "..."
-    tool = sensorTagConns[tag]
     tool.sendline('connect')
     tool.expect('Connection successful.*\[LE\]>')
     
