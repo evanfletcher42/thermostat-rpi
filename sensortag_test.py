@@ -144,7 +144,7 @@ while True:
                     db.session.commit()
                 except:
                     #fail gracefully (just don't log this time) if the DB is busy.
-                    print sys.exc_info()[0]
+                    print sys.exc_info()
                     db.session.rollback()
             else:
                 reconnect(tag, tool)
