@@ -61,14 +61,30 @@ def calcTmpTarget(objT, ambT):
     tObj = tObj + 4.72
     return (m_tmpAmb, tObj)
     
+# ditto above, for humidity sensor.  Pass in raw strings from sensor that represent numbers.
+def calcHumTmpRel(rawT, rawH):
+    # these are hex strings representing unsigned 16 bit integers
+    rawTInt = int(rawT,16)
+    rawHInt = int(rawH,16)
+    
+    temp = -46.85 + 175.72/65536 * float(rawTInt)
+    
+    rawHInt = rawHInt & ~(0x0003) # clear bits [1..0] (status bits)
+    rHumid = -6.0 + 125.0/65536 * rawHInt
+    
+    return (temp, rHumid) 
+    
 def reconnect(tag):
     print "Reconnecting to", tag, "..."
     tool = sensorTagConns[tag]
     tool.sendline('connect')
     tool.expect('Connection successful.*\[LE\]>')
-    # Enable sensor and wait for a bit for it to turn on
+    
+    # Enable sensors and wait for a bit for them to turn on
     tool.sendline('char-write-cmd 0x29 01')
     tool.expect('\[LE\]>') 
+    tool.sendline('char-write-cmd 0x3F 01')
+    tool.expect('\[LE\]>')  
     time.sleep(0.25)
 
 #Connect to all devices
@@ -94,17 +110,20 @@ while True:
     for tag in sensorTagConns:
         tool = sensorTagConns[tag]
         
-        # Enable sensor and wait for a bit for it to turn on
+        # Enable temperature sensor and wait for a bit for it to turn on
         tool.sendline('char-write-cmd 0x29 01')
         tool.expect('\[LE\]>')  
         
+        # Enable humidity sensor and wait for a bit for it to turn on
+        tool.sendline('char-write-cmd 0x3F 01')
+        tool.expect('\[LE\]>')  
     time.sleep(0.25)
         
     for tag in sensorTagConns:
         tool = sensorTagConns[tag]
         retry = True
         while retry:        
-            # Take reading
+            # Take IR temp sensor reading
             try:
                 tool.sendline('char-read-hnd 0x25')
                 i = tool.expect(['descriptor: .*', 'Disconnected'])
@@ -125,11 +144,31 @@ while True:
                 continue
             retry = False;
             
+            # Take Humidity Sensor reading
+            try:
+                tool.sendline('char-read-hnd 0x3B')
+                i = tool.expect(['descriptor: .*', 'Disconnected'])
+            except:
+                reconnect(tag, tool)
+                continue
+            if i == 0:
+                rval = tool.after.split()
+                rawT = rval[2] + rval[1]
+                rawH = rval[4] + rval[3]
+                #print rval
+                (hSensorTemp, hSensorRH) = calcHumTmpRel(rawT, rawH)
+                print tag, "\ttemp=", hSensorTemp*9/5+32, "\tRH=", hSensorRH*9/5+32
+            else:
+                reconnect(tool)
+                continue
+            retry = False;
     for tag in sensorTagConns:
         tool = sensorTagConns[tag]
         # Disable sensor (save power)
         tool.sendline('char-write-cmd 0x29 00')
         tool.expect('\[LE\]>')
+        tool.sendline('char-write-cmd 0x3F 00')
+        tool.expect('\[LE\]>') 
         retry = False
         
     totalReadTime = totalReadTime + (time.time() - startTime)
