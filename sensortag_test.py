@@ -131,7 +131,7 @@ while True:
                 (hSensorTemp, hSensorRH) = calcHumTmpRel(rawT, rawH)
                 print tag, "\ttemp=", hSensorTemp*9/5+32, "\tRH=", hSensorRH
             else:
-                reconnect(tool)
+                reconnect(tag, tool)
                 continue
             retry = False;
     for tag in sensorTagConns:
