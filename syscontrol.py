@@ -14,7 +14,7 @@ def fToC(tempF): #function that converts Fahrenheit to Celsius
 
 #If AC mode and temp > setpoint, AC will turn on.
 #AC will turn off when temp drops below setpoint - T_COOL_THRESH_C
-T_COOL_HYST_C     = 0.125
+T_COOL_HYST_C     = 0.5
 
 #If HEAT mode and temp < setpoint, HEAT will turn on.
 #AC will turn off when temp climbs above setpoint + T_HEAT_THRESH_C
