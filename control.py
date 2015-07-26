@@ -16,10 +16,14 @@ T_MAX_SETPOINT_C     = syscontrol.fToC(77)
 T_MIN_SETPOINT_C     = syscontrol.fToC(70)
 
 def calc_setpoint(extTemp, minSet, maxSet): #computes setpoint from external temperature
-	setpoint = max(minSet, extTemp)
-	setpoint = min(setpoint, maxSet)
-	return round(setpoint, 2)
-	
+    if extTemp is not None:
+        setpoint = max(minSet, extTemp)
+        setpoint = min(setpoint, maxSet)
+        return setpoint
+    else:
+        # Make a guess.
+        return (maxSet + minSet)/2
+    
 lastObsTime = None
 
 #ensure the pin controlling the heater is set as output and is off
@@ -28,37 +32,20 @@ os.system("gpio mode 2 out");
 os.system("gpio write 2 0")
 print "Done"
 
+print "Init Wunderground..."
+wunderground.init()
+print "Done"
+
 print "System running"
 
 while True:
     startTime = time.time();
     
-    obsTime = None
-    ext_temp_c = None
-    
-    #pull current weather from wunderground.
-    wgdata = wunderground.getTempC()
-    if wgdata:
-        (obsTime, ext_temp_c) = wgdata
-    else:
-        print "control: wunderground returned None"
-
-    try:
-        if wgdata and (not lastObsTime or lastObsTime < obsTime):
-            wLog = models.WeatherData(time=obsTime, extTemp = ext_temp_c)
-            db.session.add(wLog)
-            db.session.commit()
-    except IntegrityError, InvalidRequestError:
-        #Clean up from integrity violation
-        print "Cleaning up DB integrity violation...",
-        db.session.rollback()
-        db.session.commit()
-        print "Done"
-        pass
-    finally:
-        if obsTime:
-            lastObsTime = obsTime
+    # --- Weather Underground data pull ---
+    ext_temp_c = wunderground.getTempC() #Note: This CAN return None.
         
+    # --- Internal Local Temperature Measure - DS18B20 ---
+    
     #4x oversample air temp reading
     temp = 0
     for i in range(0, 4):
@@ -66,6 +53,8 @@ while True:
         
     temp = float(temp)/4
         
+    # --- Pull schedule, get setpoint limits ---
+    
     dt_meas = datetime.now()
     time_now = dt_meas.time()
     #datetime weekday is 0 on monday and 6 on sunday.  We need 0 on Sunday, 1 on Monday, ...
@@ -96,6 +85,8 @@ while True:
         else:
             print "Warning: DB seems empty.  Using default min/max setpoint."
     
+    # --- Calculate setpoint and execute system changes ---
+    
     #print 'meas time: \t', str(dt_meas)
     #print 'int temp:  \t', temp[1]
     #print 'sys temp:  \t', temp[0]
@@ -105,6 +96,8 @@ while True:
     
     #update the system state (see syscontrol.py)
     syscontrol.nextState(temp, ext_temp_c, setpt, minSetpt, maxSetpt)
+    
+    # --- Save to database ---
     
     #record stuff in database
     try:
