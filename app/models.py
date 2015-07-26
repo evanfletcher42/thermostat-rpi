@@ -37,3 +37,11 @@ class Schedule(db.Model):
     # Low/high setpoints.  
     lowSetpoint = db.Column(db.Float)
     highSetpoint = db.Column(db.Float)
+
+# Contains SensorTag log data.  Each tag is identified by its Bluetooth address.
+class SensorTagData(db.Model):
+    id          = db.Column(db.Integer, primary_key = True)
+    macAddr     = db.Column(db.CHAR(length=12), index=True)
+    time        = db.Column(db.DateTime, index=True)
+    temperature = db.Column(db.Float)
+    relHumidity = db.Column(db.Float)
