@@ -31,9 +31,9 @@ def floatfromhex(h):
 # System will connect to and poll all of these.  
 
 sensorTagAddrs = {
-    "LivingRoom" :  "B4:99:4C:64:BA:B6",
-    "Kitchen"    :  "B4:99:4C:64:AF:9F",
-    "Bedroom"    :  "B4:99:4C:64:26:80"
+    "LivingRoom" :  "B4:99:4C:64:BA:B6"
+    #"Kitchen"    :  "B4:99:4C:64:AF:9F",
+    #"Bedroom"    :  "B4:99:4C:64:26:80"
 }
 
 # This algorithm borrowed from 
@@ -61,8 +61,9 @@ def calcTmpTarget(objT, ambT):
     tObj = tObj + 4.72
     return (m_tmpAmb, tObj)
     
-def reconnect(tool):
+def reconnect(tag):
     print "Reconnecting to", tag, "..."
+	tool = sensorTagConns[tag]
     tool.sendline('connect')
     tool.expect('Connection successful.*\[LE\]>')
     # Enable sensor and wait for a bit for it to turn on
@@ -108,7 +109,7 @@ while True:
                 tool.sendline('char-read-hnd 0x25')
                 i = tool.expect(['descriptor: .*', 'Disconnected'])
             except:
-                reconnect(tool)
+                reconnect(tag, tool)
                 continue
             if i == 0:
                 rval = tool.after.split()
