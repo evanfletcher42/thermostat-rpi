@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError, InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import func, orm
 from collections import deque
+import sys
 
 # Set this to a safe value with respect to Wunderground API limits.
 __MIN_UPDATE_PERIOD_SECONDS = 5*60
@@ -80,10 +81,9 @@ def update_weather():
             try:
                 db.session.add(newPoint)
                 db.session.commit()
-            except (IntegrityError, InvalidRequestError) as e:
+            except:
+                print sys.exc_info()
                 db.session.rollback()
-                db.session.commit()
-                print type(e) 
             
             # __history shouldn't be longer than __EXTRAPOLATE_HISTORY_N
             while len(__history) > __EXTRAPOLATE_HISTORY_N:
@@ -113,7 +113,7 @@ def getTempC():
         # TODO: Generalize this with an Nth-order fit and polynomial regression.
         slope = (__history[1].extTemp - __history[0].extTemp) / ((__history[1].time - __history[0].time).total_seconds())
         dt = (datetime.now() - __history[1].time).total_seconds()
-        dt = max(dt, __EXTRAPOLATE_TIME_LIMIT_S)
+        dt = min(dt, __EXTRAPOLATE_TIME_LIMIT_S)
         est_temp = __history[1].extTemp + slope * dt;
         return est_temp;
     else:
