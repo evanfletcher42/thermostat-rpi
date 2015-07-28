@@ -28,6 +28,11 @@ dataIsNew = True
 
 wd0 = orm.aliased(models.WeatherData)
 
+class WeatherHistory:
+    def __init__(self, time, temperature):
+        self.time = time
+        self.extTemp = temperature
+
 def init():
     global __EXTRAPOLATE_HISTORY_N
     try:
@@ -35,7 +40,7 @@ def init():
         
         #Data comes in reversed (Newest .... Oldest), so fix that
         for x in wData:
-            __history.appendleft(x)
+            __history.appendleft(WeatherHistory(x.time, x.extTemp))
         
     except NoResultFound:
         print "wunderground: Warning: No temperature history found."
@@ -75,7 +80,7 @@ def update_weather():
         # Only create a new point if the last point in __history is old, or __history is empty.
         if len(__history) > 0 and obsTime > __history[-1].time or len(__history) == 0:
             newPoint = models.WeatherData(time=obsTime, extTemp = obsTemp)
-            __history.append(newPoint)
+            __history.append(WeatherHistory(obsTime, obsTemp))
             
             # Shouldn't be trouble, but be careful not to break things anyway.  
             try:
