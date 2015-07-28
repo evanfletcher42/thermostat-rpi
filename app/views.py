@@ -24,6 +24,7 @@ thermoStateStr = {
 
 ol0 = orm.aliased(models.OperationLog)
 wd0 = orm.aliased(models.WeatherData)
+st0 = orm.aliased(models.SensorTagData)
 
 def unix_time(dt):
     epoch = datetime.utcfromtimestamp(0)
@@ -90,6 +91,25 @@ def get_history():
         u'extTemps'     : wDataTemps
     })
 
+@app.route(u'/_get_st_history')
+def get_st_history():
+    global st0
+    
+    h = float(request.args.get('hours'))
+    
+    #perform query
+    stLog = db.session.query(st0).filter(st0.time >= datetime.now() - timedelta(hours=h)).all()
+    
+    #parse through data and sort into lists for each tag.
+    dataDict = dict()
+    for x in stLog:
+        if x.macAddr not in dataDict:
+            dataDict[x.macAddr] = list()
+            
+        dataDict[x.macAddr].append((x.time, x.temperature, x.relHumidity))
+    
+    return jsonify(dataDict)
+    
 @app.route(u'/graphs')
 def graphs():
     title = u'Thermostat v0.1'
