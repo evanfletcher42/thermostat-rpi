@@ -102,6 +102,7 @@ def tSCoolFan(tInt, tExt, tSet, minSetpt, maxSetpt):
         
     # Shut off the fan after TIME_COOL_COIL (coils are reasonably expected to warm up by now)
     if time.time() >= __timeStartCoolCoil + TIME_COOL_COIL:
+        LIRCCmd.toggleOnOff()
         return thermoState.COOL_OFF
     
     return thermoState.COOL_FAN
