@@ -14,7 +14,7 @@ thermoStateStr = {
     0    : u"INIT",
     1    : u"OFF-C",
     2    : u"EXT-C",
-    3    : u"AC-L",
+    3    : u"AC-FN",
     4    : u"AC-M",
     5    : u"AC-H",
     6    : u"OFF-H",

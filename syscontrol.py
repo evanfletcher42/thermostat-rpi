@@ -1,7 +1,7 @@
 #Implements system-level controls. States, state transitions, IR controls, etc.
 #Imported as a module into a high-level controller (which determines setpoint and schedule).
 
-import LIRCCmd, os
+import LIRCCmd, os, time
 
 #---- Utility functions ---
 def cToF(tempC): #function that converts Celsius to Fahrenheit 
@@ -21,13 +21,18 @@ T_COOL_HYST_C     = 0.5
 T_HEAT_HYST_C     = 0.05
 
 #---- State Transition Stuff ---
+#timer variable for COOL_FAN state
+__timeStartCoolCoil = 0 
+
+#How long in seconds to remain in COOL_FAN state before turning off
+TIME_COOL_COIL = 60
 
 # enum describing thermostat state
 class thermoState:
     INIT,       \
     COOL_OFF,   \
     COOL_EXT,   \
-    COOL_LOW,   \
+    COOL_FAN,   \
     COOL_MED,   \
     COOL_HIGH,  \
     HEAT_OFF,   \
@@ -39,7 +44,7 @@ thermoStateStr = {
     thermoState.INIT        : "INIT",
     thermoState.COOL_OFF    : "OFF (C)",
     thermoState.COOL_EXT    : "OFF (Ext)",
-    thermoState.COOL_LOW    : "AC (Low)",
+    thermoState.COOL_FAN    : "AC (Fan)",
     thermoState.COOL_MED    : "AC (Med)",
     thermoState.COOL_HIGH   : "AC (High)",
     thermoState.HEAT_OFF    : "OFF (H)",
@@ -68,17 +73,14 @@ def tSInit(tInt, tExt, tSet, minSetpt, maxSetpt):
 def tSCoolOff(tInt, tExt, tSet, minSetpt, maxSetpt):
     #First check if we should switch to heat mode
     if tInt < minSetpt:
-        # Turn off the fan - don't need that for the radiators to work
-        LIRCCmd.toggleOnOff()
         return thermoState.HEAT_OFF
     
     #Do we need to modify the temperature?
     if tInt > tSet:
         if tExt <= tSet:
-            # Turn off the fan (observed to have little effect, even if window open)
-            LIRCCmd.toggleOnOff()
             return thermoState.COOL_EXT
             
+        LIRCCmd.toggleOnOff()
         return thermoState.COOL_HIGH
         
     return thermoState.COOL_OFF
@@ -87,22 +89,34 @@ def tSCoolExt(tInt, tExt, tSet, minSetpt, maxSetpt):
     if tExt <= tSet and tInt > tSet:
         return thermoState.COOL_EXT
 
-    # fan needs to be turned on before jumping to / configuring for COOL_OFF state
-    LIRCCmd.toggleOnOff()
     return thermoState.COOL_OFF
     
-def tSCoolLow(tInt, tExt, tSet, minSetpt, maxSetpt):
-    #TODO figure out if fan speed control helps AC.  Until then use high only
-    return thermoState.COOL_HIGH
+def tSCoolFan(tInt, tExt, tSet, minSetpt, maxSetpt):
+    # Check if the temperature needs to change.
+    if tInt > tSet:
+        if tExt <= tSet:
+            LIRCCmd.toggleOnOff()
+            return thermoState.COOL_EXT
+        
+        return thermoState.COOL_HIGH
+        
+    # Shut off the fan after TIME_COOL_COIL (coils are reasonably expected to warm up by now)
+    if time.time() >= __timeStartCoolCoil + TIME_COOL_COIL:
+        return thermoState.COOL_OFF
+    
+    return thermoState.COOL_FAN
     
 def tSCoolMed(tInt, tExt, tSet, minSetpt, maxSetpt):
     #TODO figure out if fan speed control helps AC.  Until then use high only
     return thermoState.COOL_HIGH
     
 def tSCoolHigh(tInt, tExt, tSet, minSetpt, maxSetpt):
+    global __timeStartCoolCoil;
+    
     #check if done cooling the place off (has hysteresis to allow for air mixing)
     if tInt <= tSet - T_COOL_HYST_C:
-        return thermoState.COOL_OFF
+        __timeStartCoolCoil = time.time();
+        return thermoState.COOL_FAN
         
     #check if we should open a window rather than waste power with AC
     if tExt <= tSet:
@@ -149,7 +163,7 @@ thermoStateTrFcn = {
     thermoState.INIT        : tSInit,
     thermoState.COOL_OFF    : tSCoolOff,
     thermoState.COOL_EXT    : tSCoolExt,
-    thermoState.COOL_LOW    : tSCoolLow,
+    thermoState.COOL_FAN    : tSCoolFan,
     thermoState.COOL_MED    : tSCoolMed,
     thermoState.COOL_HIGH   : tSCoolHigh,
     thermoState.HEAT_OFF    : tSHeatOff,
@@ -166,17 +180,16 @@ def cfgInit():
     pass
     
 def cfgCoolOff():
-    #Low fan in this state since AC unit will still be cold after compressor shutdown,
-    #and we want to keep mixing air to prevent a cold spot
-    LIRCCmd.setFanMode()
-    LIRCCmd.setFanLow()
+    #stub - AC unit is off in this case
+    pass
     
 def cfgCoolExt():
     #stub - AC unit is off in this state
     pass
 
-def cfgCoolLow():
-    LIRCCmd.setCoolMode()
+def cfgCoolFan():
+    #Low fan in this state since AC unit will still be cold after compressor shutdown.
+    LIRCCmd.setFanMode()
     LIRCCmd.setFanLow()
 
 def cfgCoolMed():
@@ -204,7 +217,7 @@ thermoStateCfgFcn = {
     thermoState.INIT        : cfgInit,
     thermoState.COOL_OFF    : cfgCoolOff,
     thermoState.COOL_EXT    : cfgCoolExt,
-    thermoState.COOL_LOW    : cfgCoolLow,
+    thermoState.COOL_FAN    : cfgCoolFan,
     thermoState.COOL_MED    : cfgCoolMed,
     thermoState.COOL_HIGH   : cfgCoolHigh,
     thermoState.HEAT_OFF    : cfgHeatOff,
