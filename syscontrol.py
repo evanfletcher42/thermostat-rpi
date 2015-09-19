@@ -129,7 +129,6 @@ def tSCoolHigh(tInt, tExt, tSet, minSetpt, maxSetpt):
 def tSHeatOff(tInt, tExt, tSet, minSetpt, maxSetpt):
     #First check if we should even be in heating mode
     if tInt > maxSetpt:
-        LIRCCmd.toggleOnOff()
         return thermoState.COOL_OFF
     
     #Do we need to modify the temperature?
