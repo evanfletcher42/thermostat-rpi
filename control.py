@@ -28,8 +28,8 @@ lastObsTime = None
 
 #ensure the pin controlling the heater is set as output and is off
 print "Set up GPIO...",
-os.system("gpio mode 2 out");
-os.system("gpio write 2 0")
+os.system("/usr/local/bin/gpio mode 2 out");
+os.system("/usr/local/bin/gpio write 2 0")
 print "Done"
 
 print "Init Wunderground..."

@@ -201,15 +201,15 @@ def cfgCoolHigh():
     LIRCCmd.setFanHi()
 
 def cfgHeatOff():
-    os.system("gpio write 2 0")
+    os.system("/usr/local/bin/gpio write 2 0")
     pass
 
 def cfgHeatExt():
-    os.system("gpio write 2 0")
+    os.system("/usr/local/bin/gpio write 2 0")
     pass
 
 def cfgHeatOn():
-    os.system("gpio write 2 1")
+    os.system("/usr/local/bin/gpio write 2 1")
     pass
 
 # dict mapping states to their config functions
