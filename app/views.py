@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from flask import render_template, jsonify, request
+from flask.ext.basicauth import BasicAuth
 from app import app
 from app import db, models
+from app import basic_auth
 from sqlalchemy import func, orm
 from sqlalchemy.orm import load_only
 import LIRCCmd
@@ -32,11 +34,13 @@ def unix_time(dt):
     return delta.total_seconds()
 
 @app.route(u'/toggle_on_off')
+@basic_auth.required
 def toggle_on_off():
     LIRCCmd.toggleOnOff()
     return jsonify({u'Result':u'Success'})
     
 @app.route(u'/_get_current_data')
+@basic_auth.required
 def get_current_data():
     global ol0
     global wd0
@@ -63,6 +67,7 @@ def get_current_data():
     })
 
 @app.route(u'/_get_history')
+@basic_auth.required
 def get_history():
     global ol0
     global wd0
@@ -92,6 +97,7 @@ def get_history():
     })
 
 @app.route(u'/_get_st_history')
+@basic_auth.required
 def get_st_history():
     global st0
     
@@ -111,16 +117,19 @@ def get_st_history():
     return jsonify(dataDict)
     
 @app.route(u'/graphs')
+@basic_auth.required
 def graphs():
     title = u'Thermostat v0.1'
     return render_template(u"graphs.html", title=title)
     
 @app.route(u'/schedule')
+@basic_auth.required
 def schedule():
     title = u'Thermostat v0.1'
     return render_template(u"schedule.html", title=title)
     
 @app.route(u'/getSchedule')
+@basic_auth.required
 def getSchedule():
     # Pulls and displays the existing schedule in the database.
     
@@ -138,6 +147,7 @@ def getSchedule():
     return jsonify(sendJson);
     
 @app.route(u'/scheduleSubmit', methods=['POST'])
+@basic_auth.required
 def scheduleSubmit():
     # When we receive schedule data from a POST, it contains information like this:
     #
@@ -233,6 +243,7 @@ def scheduleSubmit():
     
 @app.route(u'/')
 @app.route(u'/index')
+@basic_auth.required
 
 def index():
     title = u'Thermostat v0.1'
