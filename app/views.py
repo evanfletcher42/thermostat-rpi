@@ -29,6 +29,7 @@ wd0 = orm.aliased(models.WeatherData)
 st0 = orm.aliased(models.SensorTagData)
 
 def unix_time(dt):
+    """Utility function - get unix time."""
     epoch = datetime.utcfromtimestamp(0)
     delta = dt - epoch
     return delta.total_seconds()
@@ -42,6 +43,8 @@ def toggle_on_off():
 @app.route(u'/_get_current_data')
 @basic_auth.required
 def get_current_data():
+    """Returns JSON describing the last thing in the system log."""
+    
     global ol0
     global wd0
     
@@ -69,6 +72,8 @@ def get_current_data():
 @app.route(u'/_get_history')
 @basic_auth.required
 def get_history():
+    """Returns JSON containing the last n hours of log data."""
+    
     global ol0
     global wd0
     
@@ -99,6 +104,8 @@ def get_history():
 @app.route(u'/_get_st_history')
 @basic_auth.required
 def get_st_history():
+    """Returns JSON containing the last n hours of SensorTag data."""
+
     global st0
     
     h = float(request.args.get('hours'))
@@ -131,7 +138,8 @@ def schedule():
 @app.route(u'/getSchedule')
 @basic_auth.required
 def getSchedule():
-    # Pulls and displays the existing schedule in the database.
+    """Returns JSON describing the current schedule.  
+    Used to populate the schedule page on load."""
     
     sched = db.session.query(models.Schedule).all()
     
@@ -149,6 +157,7 @@ def getSchedule():
 @app.route(u'/scheduleSubmit', methods=['POST'])
 @basic_auth.required
 def scheduleSubmit():
+    """Parses the submitted form and populates the schedule database."""
     # When we receive schedule data from a POST, it contains information like this:
     #
     # timepickerN	xx:XX(am/pm)

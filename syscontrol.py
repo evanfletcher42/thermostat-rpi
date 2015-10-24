@@ -1,30 +1,35 @@
-#Implements system-level controls. States, state transitions, IR controls, etc.
-#Imported as a module into a high-level controller (which determines setpoint and schedule).
+# Implements system-level controls. States, state transitions, IR controls, etc.
+# Imported as a module into a high-level controller (which determines setpoint and schedule).
 
-import LIRCCmd, os, time
+import LIRCCmd
+import os
+import time
 
-#---- Utility functions ---
-def cToF(tempC): #function that converts Celsius to Fahrenheit 
+
+# ---- Utility functions ---
+# function that converts Celsius to Fahrenheit
+def cToF(tempC): 
     return float(tempC)*9/5 + 32
     
-def fToC(tempF): #function that converts Fahrenheit to Celsius
+# function that converts Fahrenheit to Celsius
+def fToC(tempF): 
     return (float(tempF) - 32)*5/9
 
-#---- Behavior Constants ----
+# ---- Behavior Constants ----
 
-#If AC mode and temp > setpoint, AC will turn on.
-#AC will turn off when temp drops below setpoint - T_COOL_THRESH_C
+# If AC mode and temp > setpoint, AC will turn on.
+# AC will turn off when temp drops below setpoint - T_COOL_THRESH_C
 T_COOL_HYST_C     = 0.5
 
-#If HEAT mode and temp < setpoint, HEAT will turn on.
-#AC will turn off when temp climbs above setpoint + T_HEAT_THRESH_C
+# If HEAT mode and temp < setpoint, HEAT will turn on.
+# AC will turn off when temp climbs above setpoint + T_HEAT_THRESH_C
 T_HEAT_HYST_C     = 0.05
 
-#---- State Transition Stuff ---
-#timer variable for COOL_FAN state
+# ---- State Transition Stuff ---
+# timer variable for COOL_FAN state
 __timeStartCoolCoil = 0 
 
-#How long in seconds to remain in COOL_FAN state before turning off
+# How long in seconds to remain in COOL_FAN state before turning off
 TIME_COOL_COIL = 60
 
 # enum describing thermostat state
@@ -52,17 +57,17 @@ thermoStateStr = {
     thermoState.HEAT_ON     : "HEAT"
 }
 
-#--- State Transition Functions ---
+# --- State Transition Functions ---
 # These all take (tInt, tExt, tSet) as arguments and return the next state.
 # If stately real-time functions need to happen on a state edge (i.e. AC unit on_stop),
 # they should go in these functions.  Otherwise let the config test in nextState() take
 # care of things.
 
 def tSInit(tInt, tExt, tSet, minSetpt, maxSetpt):
-    #TODO consider weather forecast in initialization
+    # TODO consider weather forecast in initialization
     
-    #For now, if it's colder outside than inside, go into heat mode.  
-    #TODO: Initialize to last state in DB, or if DB empty, use this
+    # For now, if it's colder outside than inside, go into heat mode.  
+    # TODO: Initialize to last state in DB, or if DB empty, use this
     if tExt < tInt:
         print "syscontrol: Starting in OFF-H"
         return thermoState.HEAT_OFF
@@ -71,11 +76,11 @@ def tSInit(tInt, tExt, tSet, minSetpt, maxSetpt):
         return thermoState.COOL_OFF
         
 def tSCoolOff(tInt, tExt, tSet, minSetpt, maxSetpt):
-    #First check if we should switch to heat mode
+    # First check if we should switch to heat mode
     if tInt < minSetpt:
         return thermoState.HEAT_OFF
     
-    #Do we need to modify the temperature?
+    # Do we need to modify the temperature?
     if tInt > tSet:
         if tExt <= tSet:
             return thermoState.COOL_EXT
@@ -108,18 +113,18 @@ def tSCoolFan(tInt, tExt, tSet, minSetpt, maxSetpt):
     return thermoState.COOL_FAN
     
 def tSCoolMed(tInt, tExt, tSet, minSetpt, maxSetpt):
-    #TODO figure out if fan speed control helps AC.  Until then use high only
+    # TODO figure out if fan speed control helps AC.  Until then use high only
     return thermoState.COOL_HIGH
     
 def tSCoolHigh(tInt, tExt, tSet, minSetpt, maxSetpt):
-    global __timeStartCoolCoil;
+    global __timeStartCoolCoil
     
-    #check if done cooling the place off (has hysteresis to allow for air mixing)
+    # check if done cooling the place off (has hysteresis to allow for air mixing)
     if tInt <= tSet - T_COOL_HYST_C:
-        __timeStartCoolCoil = time.time();
+        __timeStartCoolCoil = time.time()
         return thermoState.COOL_FAN
         
-    #check if we should open a window rather than waste power with AC
+    # check if we should open a window rather than waste power with AC
     if tExt <= tSet:
         LIRCCmd.toggleOnOff()
         return thermoState.COOL_EXT
@@ -127,11 +132,11 @@ def tSCoolHigh(tInt, tExt, tSet, minSetpt, maxSetpt):
     return thermoState.COOL_HIGH
     
 def tSHeatOff(tInt, tExt, tSet, minSetpt, maxSetpt):
-    #First check if we should even be in heating mode
+    # First check if we should even be in heating mode
     if tInt > maxSetpt:
         return thermoState.COOL_OFF
     
-    #Do we need to modify the temperature?
+    # Do we need to modify the temperature?
     if tInt < tSet:
         if tExt >= tSet:
             return thermoState.HEAT_EXT
@@ -146,11 +151,11 @@ def tSHeatExt(tInt, tExt, tSet, minSetpt, maxSetpt):
     return thermoState.HEAT_OFF
     
 def tSHeatOn(tInt, tExt, tSet, minSetpt, maxSetpt):
-    #check if done heating the place (has hysteresis to allow for air mixing)
+    # check if done heating the place (has hysteresis to allow for air mixing)
     if tInt >= tSet + T_HEAT_HYST_C:
         return thermoState.HEAT_OFF
         
-    #check if we should open a window rather than waste power with heating
+    # check if we should open a window rather than waste power with heating
     if tExt >= tSet:
         return thermoState.HEAT_EXT
      
@@ -180,15 +185,15 @@ def cfgInit():
     pass
     
 def cfgCoolOff():
-    #stub - AC unit is off in this case
+    # stub - AC unit is off in this case
     pass
     
 def cfgCoolExt():
-    #stub - AC unit is off in this state
+    # stub - AC unit is off in this state
     pass
 
 def cfgCoolFan():
-    #Low fan in this state since AC unit will still be cold after compressor shutdown.
+    # Low fan in this state since AC unit will still be cold after compressor shutdown.
     LIRCCmd.setFanMode()
     LIRCCmd.setFanLow()
 
@@ -230,7 +235,7 @@ def nextState(tInt, tExt, tSet, minSetpt, maxSetpt):
     global state
     nextState = thermoStateTrFcn[state](tInt, tExt, tSet, minSetpt, maxSetpt)
     if nextState != state:
-        #configure system for new state.
+        # configure system for new state.
         thermoStateCfgFcn[nextState]()
     
-    state = nextState;
+    state = nextState

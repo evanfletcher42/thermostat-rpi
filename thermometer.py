@@ -24,8 +24,9 @@ def read_temp_raw():
 def read_temp():
     """Checks that the sensor connection was good and strips out the temperature.
     Returns a tuple of (board temperature, air temperature)."""
+    
     lines = read_temp_raw()
-    while lines[0].strip()[-3:] != 'YES':# or lines[2].strip()[-3:] != 'YES':
+    while lines[0].strip()[-3:] != 'YES':# or lines[2].strip()[-3:] != 'YES': # <- uncomment for board temp
         print "error reading from sensor:"
         print lines
         time.sleep(0.2)
