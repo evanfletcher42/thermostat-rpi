@@ -145,10 +145,23 @@
 				sortTable();
 			});
 			
-			// html table odd even row color
+			// Colorize the table based on day and row
 			function SetColor() {
-				$("tr:odd").css("background-color", "#eee");
-				$("tr:even").css("background-color", "#ddd");
+                var tbl = document.getElementById("scheduleTable").tBodies[0];
+                for(var i=0, len=tbl.rows.length; i<len; i++) {
+                    var row = tbl.rows[i];
+                    if(parseInt($($(row.cells[0]).children()[0]).val()) % 2 == 0) {
+                        if(i % 2 == 0)
+                            $(row).css("background-color", "#ccf");
+                        else
+                            $(row).css("background-color", "#ddf");
+                    } else {
+                        if(i % 2 == 0)
+                            $(row).css("background-color", "#fcc");
+                        else
+                            $(row).css("background-color", "#fdd");
+                    }
+                }
 			}
 
 			function sortTable(){
