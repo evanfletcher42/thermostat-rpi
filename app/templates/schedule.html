@@ -127,21 +127,25 @@
 			// Remove table row after clicking table row delete button
 			$("body").on("click", ".remove", function () {
 				RemoveTableRow(this);
+                return false;
 			});
 
 			// Insert new row below current row after clicking "Insert Below"
 			$("body").on("click", ".insert", function () {
 				InsertRowBelow(this);
+                return false;
 			});
 			
 			// Fires any time a daypicker changes.
 			$("body").on('change', '.daypicker', function() {	
 				sortTable();
+                return false;
 			});
 			
 			// Fires any time a timepicker changes.
 			$("body").on('change', '.timepicker', function() {	
 				sortTable();
+                return false;
 			});
 			
 			// Colorize the table based on day and row
@@ -161,6 +165,7 @@
                             $(row).css("background-color", "#fdd");
                     }
                 }
+                return false;
 			}
 
 			function sortTable(){
@@ -179,6 +184,7 @@
 				}
 				store = null;
 				SetColor();
+                return false;
 			}
 			
 			// Dynamically add and delete html table row on user click 
@@ -222,6 +228,7 @@
 				$(element).closest("tr").after(newRow);
 				SetColor();
                 $(newRow).effect("highlight", 3000)
+                return false;
 			}
 
 			// How to insert row at top of table
@@ -238,6 +245,7 @@
 				$('table').prepend(newRow);
 				SetColor();
                 $(newRow).effect("highlight", 3000)
+                return false;
 			}
 			
 			// AJAX form submission
