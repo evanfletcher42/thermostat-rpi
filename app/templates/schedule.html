@@ -206,6 +206,7 @@
 				
 				$('table').append(newRow);
 				SetColor();
+                $(newRow).effect("highlight")
 				return newRow;
 			}
 
@@ -222,6 +223,7 @@
 				
 				$(element).closest("tr").after(newRow);
 				SetColor();
+                $(newRow).effect("highlight")
 			}
 
 			// How to insert row at top of table
@@ -237,6 +239,7 @@
 				
 				$('table').prepend(newRow);
 				SetColor();
+                $(newRow).effect("highlight")
 			}
 			
 			// AJAX form submission
