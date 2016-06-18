@@ -1,0 +1,7 @@
+#include <stdlib>
+#include <stdio>
+
+typedef struct Point {
+    double x;
+    double y;
+} Point;
