@@ -252,7 +252,6 @@ def scheduleSubmit():
     
 @app.route(u'/')
 @app.route(u'/index')
-@basic_auth.required
 
 def index():
     title = u'Thermostat v0.1'
