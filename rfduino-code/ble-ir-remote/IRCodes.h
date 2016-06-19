@@ -4,6 +4,9 @@
 // example send:
 // irsend.sendGEAC(onstop, 48);
 
+#define IR_LENGTH_BITS 48
+
+#define sendIR(cmd) irsend.sendGEAC(commandsList[cmd], IR_LENGTH_BITS)
 
 enum IRCommands {
 	INVALID = 0,
@@ -17,7 +20,8 @@ enum IRCommands {
 	FS_HI,
 	FS_MID,
 	FS_LOW,
-	SLEEP
+	SLEEP,
+  CMD_END
 };
 
 unsigned char onstop[] = {
@@ -29,7 +33,7 @@ unsigned char cool[] = {
 };
 
 unsigned char fan[] = {
-	0,1,0,1,0,1,0,1,0,1,0,1,1,0,1,0,1,1,1,1,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,1,1,1,0,1,1,0,0,0,1,0,1,1
+  0,1,0,1,0,1,0,1,0,1,0,1,1,0,1,0,1,1,1,1,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,1,1,1,0,1,1,0,0,0,1,0,1,1
 };
 
 unsigned char tempup[] = {
@@ -62,4 +66,19 @@ unsigned char low[] = {
 
 unsigned char sleep[] = {
 	0,1,0,1,0,1,0,1,0,1,0,1,1,0,1,0,1,1,1,1,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,1,0,1,0,1,1,0,0,0,0,0,1,1
+};
+
+unsigned char* commandsList[] = {
+	0,
+	onstop,
+	cool,
+	fan,
+	tempup,
+	tempdown,
+	timeron,
+	timeroff,
+	hi,
+	mid,
+	low,
+	sleep
 };
