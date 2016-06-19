@@ -6,7 +6,7 @@ from app import db, models
 from app import basic_auth
 from sqlalchemy import func, orm
 from sqlalchemy.orm import load_only
-import LIRCCmd
+import BLECmd
 from datetime import datetime, timedelta
 import time
 import parsedatetime as pdt
@@ -37,7 +37,7 @@ def unix_time(dt):
 @app.route(u'/toggle_on_off')
 @basic_auth.required
 def toggle_on_off():
-    LIRCCmd.toggleOnOff()
+    BLECmd.toggleOnOff()
     return jsonify({u'Result':u'Success'})
     
 @app.route(u'/_get_current_data')
