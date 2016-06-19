@@ -20,7 +20,7 @@ def reconnect(tool):
     tool.expect('Connection successful.*\[LE\]>')
 
 #Connect to all devices
-tool = pexpect.spawn('gatttool -b ' + RFDuinoAddr + ' --interactive')
+tool = pexpect.spawn('gatttool -b ' + RFDuinoAddr + ' -t random --interactive')
 tool.expect('\[LE\]>')
 print "Connecting to RFDuino..."
 tool.sendline('connect')
