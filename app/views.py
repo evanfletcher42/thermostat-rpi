@@ -41,7 +41,6 @@ def toggle_on_off():
     return jsonify({u'Result':u'Success'})
     
 @app.route(u'/_get_current_data')
-@basic_auth.required
 def get_current_data():
     """Returns JSON describing the last thing in the system log."""
     
