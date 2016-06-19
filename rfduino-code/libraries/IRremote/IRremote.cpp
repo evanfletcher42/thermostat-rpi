@@ -187,23 +187,23 @@ void IRsend::sendGEAC(unsigned char *data, int nBits)
   enableIROut(37);
   
   // Header
-  mark(3388); 
-  space(1678);
+  mark(3360); 
+  space(1680);
 
   for(int i = 0; i < nBits; i++)
   {
       if(data[i])
       {
-        mark(430);
-        space(1257);
+        mark(420);
+        space(1260);
       } else
       {
-        mark(430);
-        space(412);
+        mark(420);
+        space(420);
       }
   }
-  mark(428);
-  space(40991);
+  mark(420);
+  space(5040);
 #ifdef __RFduino__
   timer_config_disabled();
 #endif
