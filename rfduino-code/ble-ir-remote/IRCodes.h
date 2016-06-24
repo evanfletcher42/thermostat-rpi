@@ -10,17 +10,17 @@
 
 enum IRCommands {
 	INVALID = 0,
-	ON_STOP,
-	COOL,
-	FAN,
-	TEMP_UP,
-	TEMP_DOWN,
-	TIMER_ON,
-	TIMER_OFF,
-	FS_HI,
-	FS_MID,
-	FS_LOW,
-	SLEEP,
+	ON_STOP,    //1
+	COOL,       //2
+	FAN,        //3
+	TEMP_UP,    //4
+	TEMP_DOWN,  //5
+	TIMER_ON,   //6
+	TIMER_OFF,  //7
+	FS_HI,      //8
+	FS_MID,     //9
+	FS_LOW,     //A (10)
+	SLEEP,      //B (11)
   CMD_END
 };
 
