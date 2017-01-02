@@ -67,7 +67,7 @@ def update_weather():
         __lastUpdateTime = time.time()
         
         try:
-            f = urllib2.urlopen(WUNDERGROUND_URL, timeout=1)
+            f = urllib2.urlopen(config.WUNDERGROUND_URL, timeout=1)
         except (urllib2.URLError, socket.timeout) as e:
             print "Problem reading Wunderground URL:", type(e)
             return
