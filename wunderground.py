@@ -10,6 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import func, orm
 from collections import deque
 import sys
+import config
 
 # Set this to a safe value with respect to Wunderground API limits.
 __MIN_UPDATE_PERIOD_SECONDS = 5*60
@@ -66,7 +67,7 @@ def update_weather():
         __lastUpdateTime = time.time()
         
         try:
-            f = urllib2.urlopen('http://api.wunderground.com/api/WUNDERGROUND_API_KEY/conditions/q/CO/Boulder.json', timeout=1)
+            f = urllib2.urlopen(WUNDERGROUND_URL, timeout=1)
         except (urllib2.URLError, socket.timeout) as e:
             print "Problem reading Wunderground URL:", type(e)
             return

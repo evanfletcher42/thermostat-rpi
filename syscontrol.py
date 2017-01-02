@@ -2,7 +2,7 @@
 # Imported as a module into a high-level controller (which determines setpoint and schedule).
 
 #import LIRCCmd
-import BLECmd
+import LIRCCmd
 import os
 import time
 
@@ -67,10 +67,6 @@ thermoStateStr = {
 def tSInit(tInt, tExt, tSet, minSetpt, maxSetpt):
     # TODO consider weather forecast in initialization
     
-    # Init BLE communication with AC system
-    BLECmd.initRF()
-    print "BLE comms initialized"
-    
     # For now, if it's colder outside than inside, go into heat mode.  
     # TODO: Initialize to last state in DB, or if DB empty, use this
     if tExt < tInt:
@@ -90,7 +86,7 @@ def tSCoolOff(tInt, tExt, tSet, minSetpt, maxSetpt):
         if tExt <= tSet:
             return thermoState.COOL_EXT
             
-        BLECmd.toggleOnOff()
+        LIRCCmd.toggleOnOff()
         return thermoState.COOL_HIGH
         
     return thermoState.COOL_OFF
@@ -105,14 +101,14 @@ def tSCoolFan(tInt, tExt, tSet, minSetpt, maxSetpt):
     # Check if the temperature needs to change.
     if tInt > tSet:
         if tExt <= tSet:
-            BLECmd.toggleOnOff()
+            LIRCCmd.toggleOnOff()
             return thermoState.COOL_EXT
         
         return thermoState.COOL_HIGH
         
     # Shut off the fan after TIME_COOL_COIL (coils are reasonably expected to warm up by now)
     if time.time() >= __timeStartCoolCoil + TIME_COOL_COIL:
-        BLECmd.toggleOnOff()
+        LIRCCmd.toggleOnOff()
         return thermoState.COOL_OFF
     
     return thermoState.COOL_FAN
@@ -131,7 +127,7 @@ def tSCoolHigh(tInt, tExt, tSet, minSetpt, maxSetpt):
         
     # check if we should open a window rather than waste power with AC
     if tExt <= tSet:
-        BLECmd.toggleOnOff()
+        LIRCCmd.toggleOnOff()
         return thermoState.COOL_EXT
      
     return thermoState.COOL_HIGH
@@ -199,16 +195,16 @@ def cfgCoolExt():
 
 def cfgCoolFan():
     # Low fan in this state since AC unit will still be cold after compressor shutdown.
-    BLECmd.setFanMode()
-    BLECmd.setFanLow()
+    LIRCCmd.setFanMode()
+    LIRCCmd.setFanLow()
 
 def cfgCoolMed():
-    BLECmd.setCoolMode()
-    BLECmd.setFanMed()
+    LIRCCmd.setCoolMode()
+    LIRCCmd.setFanMed()
 
 def cfgCoolHigh():
-    BLECmd.setCoolMode()
-    BLECmd.setFanHi()
+    LIRCCmd.setCoolMode()
+    LIRCCmd.setFanHi()
 
 def cfgHeatOff():
     os.system("/usr/local/bin/gpio write 2 0")
