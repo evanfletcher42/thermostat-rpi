@@ -36,4 +36,6 @@ class PIDController(object):
         self.dValue = self.D * (errFiltered - self.lastErrorLpf)
         self.lastErrorLpf = errFiltered
         
+        print "PID: P: " + str(self.pValue) + "\t I: " + str(self.iValue) + "\t D: " + str(self.dValue) + "\t U: " + str((self.pValue + self.iValue + self.dValue))
+        
         return (self.pValue + self.iValue + self.dValue)
