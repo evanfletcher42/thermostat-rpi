@@ -26,6 +26,12 @@ T_COOL_HYST_C     = 0.5
 # AC will turn off when temp climbs above setpoint + T_HEAT_THRESH_C
 T_HEAT_HYST_C     = 0.05
 
+# The PID controller will be overridden if temp < (setpoint - T_HEAT_PERMIT_OFFSET)
+T_HEAT_PERMIT_OFFSET = 2.0
+
+# When using PID control, the PWM period is this many seconds long.
+PWM_PERIOD_S = 60*20;
+
 # ---- State Transition Stuff ---
 # timer variable for COOL_FAN state
 __timeStartCoolCoil = 0 
@@ -64,7 +70,7 @@ thermoStateStr = {
 # they should go in these functions.  Otherwise let the config test in nextState() take
 # care of things.
 
-def tSInit(tInt, tExt, tSet, minSetpt, maxSetpt):
+def tSInit(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
     # TODO consider weather forecast in initialization
     
     # For now, if it's colder outside than inside, go into heat mode.  
@@ -76,7 +82,7 @@ def tSInit(tInt, tExt, tSet, minSetpt, maxSetpt):
         print "syscontrol: Starting in OFF-C"
         return thermoState.COOL_OFF
         
-def tSCoolOff(tInt, tExt, tSet, minSetpt, maxSetpt):
+def tSCoolOff(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
     # First check if we should switch to heat mode
     if tInt < minSetpt:
         return thermoState.HEAT_OFF
@@ -91,13 +97,13 @@ def tSCoolOff(tInt, tExt, tSet, minSetpt, maxSetpt):
         
     return thermoState.COOL_OFF
     
-def tSCoolExt(tInt, tExt, tSet, minSetpt, maxSetpt):
+def tSCoolExt(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
     if tExt <= tSet and tInt > tSet:
         return thermoState.COOL_EXT
 
     return thermoState.COOL_OFF
     
-def tSCoolFan(tInt, tExt, tSet, minSetpt, maxSetpt):
+def tSCoolFan(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
     # Check if the temperature needs to change.
     if tInt > tSet:
         if tExt <= tSet:
@@ -113,11 +119,11 @@ def tSCoolFan(tInt, tExt, tSet, minSetpt, maxSetpt):
     
     return thermoState.COOL_FAN
     
-def tSCoolMed(tInt, tExt, tSet, minSetpt, maxSetpt):
+def tSCoolMed(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
     # TODO figure out if fan speed control helps AC.  Until then use high only
     return thermoState.COOL_HIGH
     
-def tSCoolHigh(tInt, tExt, tSet, minSetpt, maxSetpt):
+def tSCoolHigh(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
     global __timeStartCoolCoil
     
     # check if done cooling the place off (has hysteresis to allow for air mixing)
@@ -132,35 +138,53 @@ def tSCoolHigh(tInt, tExt, tSet, minSetpt, maxSetpt):
      
     return thermoState.COOL_HIGH
     
-def tSHeatOff(tInt, tExt, tSet, minSetpt, maxSetpt):
+def tSHeatOff(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
     # First check if we should even be in heating mode
     if tInt > maxSetpt:
         return thermoState.COOL_OFF
     
-    # Do we need to modify the temperature?
-    if tInt < tSet:
+    # Do we need to force the heat on? (bad PID)
+    if tInt < tSet - T_HEAT_PERMIT_OFFSET:
+        if tExt >= tSet:
+            return thermoState.HEAT_EXT
+        return thermoState.HEAT_ON
+        
+    # Do we need to force the heat to stay off? (bad PID)
+    if tInt > tSet + T_HEAT_PERMIT_OFFSET
+        return thermoState.HEAT_OFF
+    
+    # So long as the PID controller is behaving, does it say we should be heating now?
+    if pidResult*PWM_PERIOD_S > time % PWM_PERIOD_S
         if tExt >= tSet:
             return thermoState.HEAT_EXT
         return thermoState.HEAT_ON
         
     return thermoState.HEAT_OFF
     
-def tSHeatExt(tInt, tExt, tSet, minSetpt, maxSetpt):
+def tSHeatExt(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
     if tExt >= tSet and tInt < tSet:
         return thermoState.HEAT_EXT
     
     return thermoState.HEAT_OFF
     
-def tSHeatOn(tInt, tExt, tSet, minSetpt, maxSetpt):
-    # check if done heating the place (has hysteresis to allow for air mixing)
-    if tInt >= tSet + T_HEAT_HYST_C:
-        return thermoState.HEAT_OFF
-        
+def tSHeatOn(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
     # check if we should open a window rather than waste power with heating
     if tExt >= tSet:
         return thermoState.HEAT_EXT
-     
-    return thermoState.HEAT_ON
+        
+    # Do we need to force the heat off? (bad PID)
+    if tInt >= tSet + T_HEAT_PERMIT_OFFSET:
+        return thermoState.HEAT_OFF
+
+    # Do we need to force the heat to stay on? (bad PID)
+    if tInt < tSet - T_HEAT_PERMIT_OFFSET:
+        return thermoState.HEAT_ON
+        
+    # So long as the PID controller is behaving, does it say we should be heating now?
+    if pidResult*PWM_PERIOD_S > time % PWM_PERIOD_S
+        return thermoState.HEAT_ON
+    
+    return thermoState.HEAT_OFF
   
 state = thermoState.INIT  # The state variable.  This is global.
 
@@ -231,10 +255,10 @@ thermoStateCfgFcn = {
     thermoState.HEAT_ON     : cfgHeatOn
 }
 
-def nextState(tInt, tExt, tSet, minSetpt, maxSetpt):
+def nextState(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
     """Computes next state given current state and temps"""
     global state
-    nextState = thermoStateTrFcn[state](tInt, tExt, tSet, minSetpt, maxSetpt)
+    nextState = thermoStateTrFcn[state](tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time)
     if nextState != state:
         # configure system for new state.
         thermoStateCfgFcn[nextState]()

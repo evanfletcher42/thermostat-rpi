@@ -3,6 +3,7 @@ import time
 import wunderground
 import thermometer
 import syscontrol
+import pidcontroller
 import os
 
 from app import db, models
@@ -15,6 +16,9 @@ from sqlalchemy.orm.exc import NoResultFound
 # will be between these two numbers.
 T_MAX_SETPOINT_C     = syscontrol.fToC(77)
 T_MIN_SETPOINT_C     = syscontrol.fToC(70)
+
+# this is useful for timing heater stuff.
+epoch = datetime.utcfromtimestamp(0)
 
 def calc_setpoint(extTemp, minSet, maxSet): 
     """Computes setpoint from external temperature."""
@@ -34,6 +38,10 @@ print "Done"
 
 print "Init Wunderground..."
 wunderground.init()
+print "Done"
+
+print "Init PID"
+pid = PIDController()
 print "Done"
 
 print "System running"
@@ -97,8 +105,12 @@ while True:
     setpt = calc_setpoint(ext_temp_c, minSetpt, maxSetpt)
     #print '\nsetpoint: \t', setpt
     
+    #update PID controller
+    pidResult = pid.update()
+    
     #update the system state (see syscontrol.py)
-    syscontrol.nextState(temp, ext_temp_c, setpt, minSetpt, maxSetpt)
+    secondsSinceEpoch = (dt_meas - epoch).total_seconds()
+    syscontrol.nextState(temp, ext_temp_c, setpt, minSetpt, maxSetpt, pidResult, time_now)
     
     # --- Save to database ---
     
