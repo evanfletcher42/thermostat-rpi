@@ -150,11 +150,11 @@ def tSHeatOff(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
         return thermoState.HEAT_ON
         
     # Do we need to force the heat to stay off? (bad PID)
-    if tInt > tSet + T_HEAT_PERMIT_OFFSET
+    if tInt > tSet + T_HEAT_PERMIT_OFFSET:
         return thermoState.HEAT_OFF
     
     # So long as the PID controller is behaving, does it say we should be heating now?
-    if pidResult*PWM_PERIOD_S > time % PWM_PERIOD_S
+    if pidResult*PWM_PERIOD_S > time % PWM_PERIOD_S:
         if tExt >= tSet:
             return thermoState.HEAT_EXT
         return thermoState.HEAT_ON
@@ -181,7 +181,7 @@ def tSHeatOn(tInt, tExt, tSet, minSetpt, maxSetpt, pidResult, time):
         return thermoState.HEAT_ON
         
     # So long as the PID controller is behaving, does it say we should be heating now?
-    if pidResult*PWM_PERIOD_S > time % PWM_PERIOD_S
+    if pidResult*PWM_PERIOD_S > time % PWM_PERIOD_S:
         return thermoState.HEAT_ON
     
     return thermoState.HEAT_OFF

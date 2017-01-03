@@ -41,7 +41,7 @@ wunderground.init()
 print "Done"
 
 print "Init PID"
-pid = PIDController()
+pid = pidcontroller.PIDController()
 print "Done"
 
 print "System running"
@@ -106,11 +106,11 @@ while True:
     #print '\nsetpoint: \t', setpt
     
     #update PID controller
-    pidResult = pid.update()
+    pidResult = pid.update(temp, setpt)
     
     #update the system state (see syscontrol.py)
     secondsSinceEpoch = (dt_meas - epoch).total_seconds()
-    syscontrol.nextState(temp, ext_temp_c, setpt, minSetpt, maxSetpt, pidResult, time_now)
+    syscontrol.nextState(temp, ext_temp_c, setpt, minSetpt, maxSetpt, pidResult, secondsSinceEpoch)
     
     # --- Save to database ---
     

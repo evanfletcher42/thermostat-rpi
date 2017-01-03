@@ -30,7 +30,7 @@ class PIDController(object):
         self.pValue = self.P * error
         
         self.iValue = self.I * error + self.iValue
-        self.iValue = max(min(self.MAX_I_VAL, n), -1*self.MAX_I_VAL)
+        self.iValue = max(min(self.MAX_I_VAL, self.iValue), -1*self.MAX_I_VAL)
         
         errFiltered =  self.lastErrorLpf*(1-self.LPF_COEF) + error*self.LPF_COEF
         self.dValue = self.D * (errFiltered - self.lastErrorLpf)
